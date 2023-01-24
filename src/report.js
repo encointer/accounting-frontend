@@ -1,0 +1,73 @@
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import { summaryLogFields } from "./consts";
+
+import encointerLogo from "./encointerLogo";
+import { getMonthName, round } from "./util";
+export function getReport(data) {
+    const stretch = 0.15;
+    const doc = new jsPDF();
+    const width = doc.internal.pageSize.getWidth();
+    const height = doc.internal.pageSize.getHeight();
+
+    doc.setFontSize(20);
+    doc.text(10, 25, `Encointer Report ${data.year}`);
+    doc.setFontSize(15);
+    doc.text(10, 35, `${data.name} at ${data.communityName}`);
+    doc.text(10, 50, "Summary");
+
+    doc.addImage(
+        encointerLogo,
+        width - 348 * stretch,
+        0,
+        348 * stretch,
+        234 * stretch
+    );
+    autoTable(doc, {
+        head: [summaryLogFields],
+        body: data.data.map((e) => [
+            getMonthName(e.month),
+            round(e.incomeMinusExpenses),
+            round(e.sumIssues),
+            round(e.balance),
+            round(e.costDemurrage),
+            e.numIncoming,
+            e.numOutgoing,
+            e.numIssues,
+            e.numDistinctClients,
+        ]),
+        startY: 60,
+    });
+
+    for (const monthItem of data.data) {
+        doc.addPage();
+        doc.setFontSize(20);
+        doc.text(
+            10,
+            25,
+            `${getMonthName(monthItem.month)} ${data.year} Detailed Report`
+        );
+        autoTable(doc, {
+            head: [["Timestamp", "Counterparty", "Amount"]],
+            body: monthItem.txnLog.map((e) => [
+                new Date(e.timestamp * 1000).toUTCString(),
+                e.counterParty,
+                e.amount,
+            ]),
+            startY: 40,
+        });
+    }
+
+    // add pagenumbers
+    const pages = doc.internal.getNumberOfPages();
+    doc.setFontSize(8); //Optional
+    for (let j = 1; j < pages + 1; j++) {
+        let horizontalPos = width / 2; //Can be fixed number
+        let verticalPos = height - 6; //Can be fixed number
+        doc.setPage(j);
+        doc.text(`${j} of ${pages}`, horizontalPos, verticalPos, {
+            align: "center",
+        });
+    }
+    return doc;
+}
