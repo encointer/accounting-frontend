@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable";
 import { summaryLogFields } from "./consts";
 
 import encointerLogo from "./encointerLogo";
-import { getMonthName, round } from "./util";
+import { round } from "./util";
 export function getReport(data) {
     const stretch = 0.15;
     const doc = new jsPDF();
@@ -26,7 +26,7 @@ export function getReport(data) {
     autoTable(doc, {
         head: [summaryLogFields],
         body: data.data.map((e) => [
-            getMonthName(e.month),
+            e.month,
             round(e.incomeMinusExpenses),
             round(e.sumIssues),
             round(e.balance),
@@ -42,11 +42,7 @@ export function getReport(data) {
     for (const monthItem of data.data) {
         doc.addPage();
         doc.setFontSize(20);
-        doc.text(
-            10,
-            25,
-            `${getMonthName(monthItem.month)} ${data.year} Detailed Report`
-        );
+        doc.text(10, 25, `${monthItem.month} ${data.year} Detailed Report`);
         autoTable(doc, {
             head: [["Timestamp", "Counterparty", "Amount"]],
             body: monthItem.txnLog.map((e) => [

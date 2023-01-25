@@ -1,6 +1,6 @@
 import { round } from "../util";
 
-const SummaryLogWRow = ({
+const SummaryLogRow = ({
     month,
     incomeMinusExpenses,
     sumIssues,
@@ -10,7 +10,6 @@ const SummaryLogWRow = ({
     numIssues,
     numDistinctClients,
     costDemurrage,
-    txnLog
 }) => {
     return (
         <tr>
@@ -24,9 +23,9 @@ const SummaryLogWRow = ({
             <td>{numIssues}</td>
             <td>{numDistinctClients}</td>
 
-            <td><button class="button is-link">Download Transaction Log</button></td>
+            {/* <td><button className="button is-link">Download Transaction Log</button></td> */}
         </tr>
     );
 };
 
-export default SummaryLogWRow;
+export default SummaryLogRow;

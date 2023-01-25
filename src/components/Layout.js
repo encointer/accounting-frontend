@@ -13,18 +13,19 @@ const Layout = ({ children }) => {
                 gridTemplateRows: "auto 1fr auto",
             }}
         >
-            <div class="columns is-vcentered">
+            <div className="columns is-vcentered">
                 <div className="column is-3">
-                    <img src="https://encointer.org/wp-content/uploads/2022/03/Frame-4.png" />
+                    <img src="https://encointer.org/wp-content/uploads/2022/03/Frame-4.png" alt="Logo"/>
                 </div>
-                <div className="column is-size-3 has-text-right">Accounting</div>
+                <div className="column is-size-3 has-text-right">
+                    Accounting
+                </div>
             </div>
             {children}
             <footer>
                 <br />
                 <br />
-                <br />
-                © 2023 Encointer Association
+                <br />© 2023 Encointer Association
             </footer>
         </div>
     );

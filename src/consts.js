@@ -7,5 +7,5 @@ export const summaryLogFields = [
     "# Incoming",
     "# Outgoing",
     "# Issues",
-    "# distinct clients",
+    "# Distinct Clients",
 ];

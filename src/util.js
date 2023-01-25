@@ -26,3 +26,21 @@ export function getMonthName(idx) {
     ];
     return monthNames[idx];
 }
+
+function getDateString(timestamp) {
+    return new Date(parseInt(timestamp)).toUTCString().replace(",", "");
+}
+
+export function getTxnLogCsv(data) {
+    const csvString = [
+        ["Timestamp", "Counterparty", "Amount"],
+        ...data.map((item) => [
+            getDateString(item.timestamp),
+            item.counterParty,
+            item.amount,
+        ]),
+    ]
+        .map((e) => e.join(","))
+        .join("\n");
+    return csvString;
+}

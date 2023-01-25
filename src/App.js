@@ -2,72 +2,89 @@ import "bulma/css/bulma.min.css";
 import { useEffect, useState } from "react";
 import AddressForm from "./components/AddressForm";
 import Layout from "./components/Layout";
-import SummaryLogWRow from "./components/SummaryLogRow";
-import { downloadDataUrl } from "./util";
+import { downloadDataUrl, getMonthName, getTxnLogCsv } from "./util";
 import { getReport } from "./report";
-import { summaryLogFields } from "./consts";
+import JSZip from "jszip";
+import Summary from "./components/Summary";
 
 const App = () => {
     const [data, setData] = useState({});
+    const [address, setAddress] = useState("");
+    const [token, setToken] = useState("");
+    const [cid, setCid] = useState("");
+    const [wrongPassword, setWrongPassword] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
-            const res = await fetch(
-                "http://localhost:8081/get-accounting-data?&account=HhuYrWaBKfqB4HbEVdLUHWEPM6TE7cSe9tQsf8reRuvN4vk&cid=u0qj944rhWE&token=abc"
-            );
-            const reportData = await res.json();
-            reportData.data = [
-                reportData.data[0],
-                reportData.data[0],
-                reportData.data[0],
-                reportData.data[0],
-                reportData.data[0],
-            ]
-            setData(reportData);
+            if (address && cid && token) {
+                const res = await fetch(
+                    `http://localhost:8081/get-accounting-data?&account=${address}&cid=${cid}&token=${token}`
+                );
+                if (res.status === 403) {
+                    setWrongPassword(true);
+                    return;
+                }
+
+                if (res.ok) {
+                    const reportData = await res.json();
+                    setWrongPassword(false);
+                    reportData.data.forEach(
+                        (e) => (e.month = getMonthName(e.month))
+                    );
+                    reportData.data = [
+                        reportData.data[0],
+                        reportData.data[0],
+                        reportData.data[0],
+                        reportData.data[0],
+                        reportData.data[0],
+                    ];
+                    setData(reportData);
+                }
+            }
         };
         fetchData().catch(console.error);
-    });
+    }, [address, cid, token]);
 
-    const handleSummaryLogDownlaod = () => {
-        const report = getReport(
-            data
+    const handleSummaryLogDownlaod = async () => {
+        const report = getReport(data);
+        const zip = new JSZip();
+        zip.file("report.pdf", report.output("blob"));
+        data.data.forEach((e, idx) =>
+            zip.file(`${idx}_${e.month}.csv`, getTxnLogCsv(e.txnLog))
         );
-        downloadDataUrl(report.output("datauristring"), "doc.pdf");
+
+        let downloadFile = await zip.generateAsync({ type: "base64" });
+        downloadDataUrl(
+            "data:application/zip;base64," + downloadFile,
+            "report.zip"
+        );
     };
 
-    if (Object.keys(data).length !== 0) {
-        return (
-            <Layout>
-                <div className="container">
-                    <AddressForm />
-                    <br />
-                    <br />
-                    <br />
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                {summaryLogFields.map((val, i) => (
-                                    <th key={i}>{val}</th>
-                                ))}
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data.data.map((row, i) => (
-                                <SummaryLogWRow {...row} key={i} />
-                            ))}
-                        </tbody>
-                    </table>
-                    <button
-                        className="button is-link"
-                        onClick={handleSummaryLogDownlaod}
-                    >
-                        Download Summary Log
-                    </button>
-                </div>
-            </Layout>
-        );
-    }
+    const handleSubmitAddressForm = (e) => {
+        e.preventDefault();
+        setAddress(e.target.form.address.value);
+        setToken(e.target.form.token.value);
+        setCid(e.target.form.cid.value);
+    };
+
+    return (
+        <Layout>
+            <div className="container" style={{ width: "100%" }}>
+                <AddressForm handleSubmit={handleSubmitAddressForm} />
+                {wrongPassword && (
+                    <p style={{ color: "red" }}>Wrong password</p>
+                )}
+                <br />
+                <br />
+                {Object.keys(data).length !== 0 && (
+                    <Summary
+                        data={data}
+                        handleSummaryLogDownlaod={handleSummaryLogDownlaod}
+                    />
+                )}
+            </div>
+        </Layout>
+    );
 };
 
 export default App;
