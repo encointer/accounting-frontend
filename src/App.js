@@ -1,90 +1,19 @@
 import "bulma/css/bulma.min.css";
-import { useEffect, useState } from "react";
-import AddressForm from "./components/AddressForm";
-import Layout from "./components/Layout";
-import { downloadDataUrl, getMonthName, getTxnLogCsv } from "./util";
-import { getReport } from "./report";
-import JSZip from "jszip";
-import Summary from "./components/Summary";
+import "./App.css";
+import { Routes, Route } from "react-router-dom";
+import { React } from "react";
+import AccountReport from "./components/AccountReport";
+import AccountOverview from "./components/AccountOverview";
 
-const App = () => {
-    const [data, setData] = useState({});
-    const [address, setAddress] = useState("");
-    const [token, setToken] = useState("");
-    const [cid, setCid] = useState("");
-    const [wrongPassword, setWrongPassword] = useState(false);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            if (address && cid && token) {
-                const res = await fetch(
-                    `http://localhost:8081/get-accounting-data?&account=${address}&cid=${cid}&token=${token}`
-                );
-                if (res.status === 403) {
-                    setWrongPassword(true);
-                    return;
-                }
-
-                if (res.ok) {
-                    const reportData = await res.json();
-                    setWrongPassword(false);
-                    reportData.data.forEach(
-                        (e) => (e.month = getMonthName(e.month))
-                    );
-                    reportData.data = [
-                        reportData.data[0],
-                        reportData.data[0],
-                        reportData.data[0],
-                        reportData.data[0],
-                        reportData.data[0],
-                    ];
-                    setData(reportData);
-                }
-            }
-        };
-        fetchData().catch(console.error);
-    }, [address, cid, token]);
-
-    const handleSummaryLogDownlaod = async () => {
-        const report = getReport(data);
-        const zip = new JSZip();
-        zip.file("report.pdf", report.output("blob"));
-        data.data.forEach((e, idx) =>
-            zip.file(`${idx}_${e.month}.csv`, getTxnLogCsv(e.txnLog))
-        );
-
-        let downloadFile = await zip.generateAsync({ type: "base64" });
-        downloadDataUrl(
-            "data:application/zip;base64," + downloadFile,
-            "report.zip"
-        );
-    };
-
-    const handleSubmitAddressForm = (e) => {
-        e.preventDefault();
-        setAddress(e.target.form.address.value);
-        setToken(e.target.form.token.value);
-        setCid(e.target.form.cid.value);
-    };
-
+function App() {
     return (
-        <Layout>
-            <div className="container" style={{ width: "100%" }}>
-                <AddressForm handleSubmit={handleSubmitAddressForm} />
-                {wrongPassword && (
-                    <p style={{ color: "red" }}>Wrong password</p>
-                )}
-                <br />
-                <br />
-                {Object.keys(data).length !== 0 && (
-                    <Summary
-                        data={data}
-                        handleSummaryLogDownlaod={handleSummaryLogDownlaod}
-                    />
-                )}
-            </div>
-        </Layout>
+        <div className="App">
+            <Routes>
+                <Route path="/account-report" element={<AccountReport />} />
+                <Route path="/account-overview" element={<AccountOverview />} />
+            </Routes>
+        </div>
     );
-};
+}
 
 export default App;

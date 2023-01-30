@@ -44,3 +44,13 @@ export function getTxnLogCsv(data) {
         .join("\n");
     return csvString;
 }
+
+export function getAccountOverviewCsv(data) {
+    const csvString = [
+        ["Account", "Balance"],
+        ...data.map((item) => [item.account, item.balance]),
+    ]
+        .map((e) => e.join(","))
+        .join("\n");
+    return csvString;
+}

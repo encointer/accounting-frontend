@@ -1,3 +1,5 @@
+import CidSelect from "./CidSelect";
+
 const AddressForm = ({ handleSubmit }) => {
     return (
         <form>
@@ -12,17 +14,7 @@ const AddressForm = ({ handleSubmit }) => {
                         />
                     </div>
                 </div>
-                <div className="field">
-                    <label>CID</label>
-                    <div className="control">
-                        <div className="select">
-                            <select name="cid">
-                                <option value="u0qj944rhWE">LEU</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
+                <CidSelect/>
                 <div className="field">
                     <label>Password</label>
                     <div className="control">
