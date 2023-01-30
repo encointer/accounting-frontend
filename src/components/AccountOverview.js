@@ -3,11 +3,13 @@ import Layout from "./Layout";
 import { downloadDataUrl, getAccountOverviewCsv } from "../util";
 import TimestampCidForm from "./TimestampCidForm";
 import AccountOverviewTable from "./AccountOverviewTable";
+import Spinner from "./Spinner";
 
 const AccountOverview = () => {
     const [data, setData] = useState({});
     const [cid, setCid] = useState("");
     const [timestamp, setTimestamp] = useState(0);
+    const [showSpinner, setShowSpinner] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -22,6 +24,7 @@ const AccountOverview = () => {
                     const d = await res.json();
                     d.data.sort((a, b) => b.balance - a.balance);
                     setData(d);
+                    setShowSpinner(false);
                 }
             }
         };
@@ -43,6 +46,7 @@ const AccountOverview = () => {
     const handleSubmitForm = (e) => {
         e.preventDefault();
         setData({});
+        setShowSpinner(true);
         setTimestamp(new Date(e.target.form[0].value).getTime());
         setCid(e.target.form.cid.value);
     };
@@ -53,6 +57,7 @@ const AccountOverview = () => {
                 <TimestampCidForm handleSubmit={handleSubmitForm} />
                 <br />
                 <br />
+                {showSpinner && <Spinner />}
                 {Object.keys(data).length !== 0 && (
                     <div
                         style={{

@@ -1,5 +1,5 @@
 import "bulma/css/bulma.min.css";
-import "./App.css";
+import "./Spinner.css";
 import { Routes, Route } from "react-router-dom";
 import { React } from "react";
 import AccountReport from "./components/AccountReport";

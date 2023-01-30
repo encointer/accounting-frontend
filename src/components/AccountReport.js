@@ -6,6 +6,7 @@ import { downloadDataUrl, getMonthName, getTxnLogCsv } from "../util";
 import { getReport } from "../report";
 import JSZip from "jszip";
 import Summary from "./Summary";
+import Spinner from "./Spinner";
 
 const AccountReport = () => {
     const [data, setData] = useState({});
@@ -13,6 +14,7 @@ const AccountReport = () => {
     const [token, setToken] = useState("");
     const [cid, setCid] = useState("");
     const [wrongPassword, setWrongPassword] = useState(false);
+    const [showSpinner, setShowSpinner] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -39,6 +41,7 @@ const AccountReport = () => {
                     //     reportData.data[0],
                     // ];
                     setData(reportData);
+                    setShowSpinner(false);
                 }
             }
         };
@@ -63,6 +66,7 @@ const AccountReport = () => {
     const handleSubmitAddressForm = (e) => {
         e.preventDefault();
         setData({});
+        setShowSpinner(true);
         setAddress(e.target.form.address.value);
         setToken(e.target.form.token.value);
         setCid(e.target.form.cid.value);
@@ -77,6 +81,7 @@ const AccountReport = () => {
                 )}
                 <br />
                 <br />
+                {showSpinner && <Spinner />}
                 {Object.keys(data).length !== 0 && (
                     <Summary
                         data={data}
