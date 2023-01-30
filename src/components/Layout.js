@@ -1,4 +1,5 @@
 import "bulma/css/bulma.min.css";
+import { Link } from "react-router-dom";
 
 const Layout = ({ children }) => {
     return (
@@ -15,10 +16,15 @@ const Layout = ({ children }) => {
         >
             <div className="columns is-vcentered">
                 <div className="column is-3">
-                    <img src="https://encointer.org/wp-content/uploads/2022/03/Frame-4.png" alt="Logo"/>
+                    <Link to="/"><img src="https://encointer.org/wp-content/uploads/2022/03/Frame-4.png" alt="Logo"/></Link>
                 </div>
-                <div className="column is-size-3 has-text-right">
-                    Accounting
+                <div className="column is-7">
+                </div>
+                <div className="column is-1 has-background-light has-margin m-1">
+                    <Link to="/account-overview">Account Overview</Link>
+                </div>
+                <div className="column is-1 has-background-light m-1">
+                    <Link to="/account-report">Account Report</Link>
                 </div>
             </div>
             {children}
