@@ -7,6 +7,7 @@ import { getReport } from "../report";
 import JSZip from "jszip";
 import Summary from "./Summary";
 import Spinner from "./Spinner";
+import { API_URL } from "../consts";
 
 const AccountReport = () => {
     const [data, setData] = useState({});
@@ -20,7 +21,7 @@ const AccountReport = () => {
         const fetchData = async () => {
             if (address && cid && token) {
                 const res = await fetch(
-                    `http://localhost:8081/get-accounting-data?&account=${address}&cid=${cid}&token=${token}`
+                    `${API_URL}/get-accounting-data?&account=${address}&cid=${cid}&token=${token}`
                 );
                 if (res.status === 403) {
                     setWrongPassword(true);

@@ -4,6 +4,7 @@ import { downloadDataUrl, getAccountOverviewCsv } from "../util";
 import TimestampCidForm from "./TimestampCidForm";
 import AccountOverviewTable from "./AccountOverviewTable";
 import Spinner from "./Spinner";
+import { API_URL } from "../consts";
 
 const AccountOverview = () => {
     const [data, setData] = useState({});
@@ -15,7 +16,7 @@ const AccountOverview = () => {
         const fetchData = async () => {
             if (cid && timestamp) {
                 const res = await fetch(
-                    `http://localhost:8081/get-account-overview?timestamp=${
+                    `${API_URL}/get-account-overview?timestamp=${
                         timestamp
                     }&cid=${cid}`
                 );
