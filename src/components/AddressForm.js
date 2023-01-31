@@ -3,7 +3,7 @@ import CidSelect from "./CidSelect";
 const AddressForm = ({ handleSubmit }) => {
     return (
         <form>
-            <div>
+            <div style={{width: 'min(100%, 600px)'}}>
                 <div className="field">
                     <label>Address</label>
                     <div className="control">
