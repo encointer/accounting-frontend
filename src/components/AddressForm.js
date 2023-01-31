@@ -20,7 +20,7 @@ const AddressForm = ({ handleSubmit }) => {
                     <div className="control">
                         <input
                             className="input"
-                            type="text"
+                            type="password"
                             name="token"
                         />
                     </div>
