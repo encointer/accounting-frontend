@@ -18,12 +18,12 @@ const Layout = ({ children }) => {
                 <div className="column is-3">
                     <Link to="/"><img src="https://encointer.org/wp-content/uploads/2022/03/Frame-4.png" alt="Logo"/></Link>
                 </div>
-                <div className="column is-7">
+                <div className="column">
                 </div>
-                <div className="column is-1 has-background-light has-margin m-1">
+                <div className="column is-narrow has-background-light m-1">
                     <Link to="/account-overview">Account Overview</Link>
                 </div>
-                <div className="column is-1 has-background-light m-1">
+                <div className="column is-narrow has-background-light m-1">
                     <Link to="/account-report">Account Report</Link>
                 </div>
             </div>

@@ -16,7 +16,7 @@ const AccountOverview = () => {
             if (cid && timestamp) {
                 const res = await fetch(
                     `http://localhost:8081/get-account-overview?timestamp=${
-                        timestamp * 1000
+                        timestamp
                     }&cid=${cid}`
                 );
 
@@ -29,7 +29,7 @@ const AccountOverview = () => {
             }
         };
         fetchData().catch(console.error);
-    });
+    }, [cid, timestamp]);
 
     const handleDownloadReport = async () => {
         const csv = getAccountOverviewCsv(data.data);
