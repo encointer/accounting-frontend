@@ -9,28 +9,36 @@ import { API_URL } from "../consts";
 const AccountOverview = () => {
     const [data, setData] = useState({});
     const [cid, setCid] = useState("");
+    const [token, setToken] = useState("");
     const [timestamp, setTimestamp] = useState(0);
     const [showSpinner, setShowSpinner] = useState(false);
+    const [wrongPassword, setWrongPassword] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
-            if (cid && timestamp) {
+            if (cid && timestamp && token) {
                 const res = await fetch(
                     `${API_URL}/get-account-overview?timestamp=${
                         timestamp
-                    }&cid=${cid}`
+                    }&cid=${cid}&token=${token}`
                 );
+
+                if (res.status === 403) {
+                    setWrongPassword(true);
+                    return;
+                }
 
                 if (res.ok) {
                     const d = await res.json();
                     d.data.sort((a, b) => b.balance - a.balance);
                     setData(d);
+                    setWrongPassword(false);
                     setShowSpinner(false);
                 }
             }
         };
         fetchData().catch(console.error);
-    }, [cid, timestamp]);
+    }, [cid, timestamp, token]);
 
     const handleDownloadReport = async () => {
         const csv = getAccountOverviewCsv(data.data);
@@ -49,6 +57,7 @@ const AccountOverview = () => {
         setData({});
         setShowSpinner(true);
         setTimestamp(new Date(e.target.form[0].value).getTime());
+        setToken(e.target.form.token.value);
         setCid(e.target.form.cid.value);
     };
 
@@ -56,6 +65,9 @@ const AccountOverview = () => {
         <Layout>
             <div className="container" style={{ width: "100%" }}>
                 <TimestampCidForm handleSubmit={handleSubmitForm} />
+                {wrongPassword && (
+                    <p style={{ color: "red" }}>Wrong password</p>
+                )}
                 <br />
                 <br />
                 {showSpinner && <Spinner />}
