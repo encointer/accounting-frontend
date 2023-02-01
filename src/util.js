@@ -54,3 +54,10 @@ export function getAccountOverviewCsv(data) {
         .join("\n");
     return csvString;
 }
+
+export function getTurnoverReportCsv(header, rows) {
+    const csvString = [["Month"].concat(header), ...rows]
+        .map((e) => e.join(","))
+        .join("\n");
+    return csvString;
+}

@@ -26,6 +26,9 @@ const Layout = ({ children }) => {
                 <div className="column is-narrow has-background-light m-1">
                     <Link to="/account-report">Account Report</Link>
                 </div>
+                <div className="column is-narrow has-background-light m-1">
+                    <Link to="/turnover-report">Turnover Report</Link>
+                </div>
             </div>
             {children}
             <footer>
