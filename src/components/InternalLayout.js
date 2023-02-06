@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const Layout = ({ children, title, communityName }) => {
+const InternalLayout = ({ children }) => {
     return (
         <div
             className="main"
@@ -15,25 +15,20 @@ const Layout = ({ children, title, communityName }) => {
         >
             <div className="columns is-vcentered">
                 <div className="column is-3">
-                    <Link to="/">
+                    <Link to="/internal">
                         <img
-                            style={{
-                                marginTop: "15px",
-                                width: "150px"
-                            }}
-                            src={`logos/${communityName}.png`}
+                            src="https://encointer.org/wp-content/uploads/2022/03/Frame-4.png"
                             alt="Logo"
-                            onError={({ currentTarget }) => {
-                                currentTarget.onerror = null; // prevents looping
-                                currentTarget.src =
-                                    "https://encointer.org/wp-content/uploads/2022/03/Frame-4.png";
-                            }}
                         />
                     </Link>
                 </div>
                 <div className="column"></div>
-
-                <div className="column is-narrow m-1">{title}</div>
+                <div className="column is-narrow has-background-light m-1">
+                    <Link to="/account-overview">Account Overview</Link>
+                </div>
+                <div className="column is-narrow has-background-light m-1">
+                    <Link to="/turnover-report">Turnover Report</Link>
+                </div>
             </div>
             {children}
             <footer>
@@ -45,4 +40,4 @@ const Layout = ({ children, title, communityName }) => {
     );
 };
 
-export default Layout;
+export default InternalLayout;

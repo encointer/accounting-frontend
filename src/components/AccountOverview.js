@@ -5,6 +5,7 @@ import TimestampCidForm from "./TimestampCidForm";
 import AccountOverviewTable from "./AccountOverviewTable";
 import Spinner from "./Spinner";
 import { API_URL } from "../consts";
+import InternalLayout from "./InternalLayout";
 
 const AccountOverview = () => {
     const [data, setData] = useState({});
@@ -62,7 +63,7 @@ const AccountOverview = () => {
     };
 
     return (
-        <Layout>
+        <InternalLayout>
             <div className="container" style={{ width: "100%" }}>
                 <TimestampCidForm handleSubmit={handleSubmitForm} />
                 {wrongPassword && (
@@ -86,7 +87,7 @@ const AccountOverview = () => {
                     </div>
                 )}
             </div>
-        </Layout>
+        </InternalLayout>
     );
 };
 

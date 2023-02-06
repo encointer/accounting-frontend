@@ -5,6 +5,7 @@ import Spinner from "./Spinner";
 import { API_URL } from "../consts";
 import CidForm from "./CidForm";
 import TurnoverTable from "./TurnoverTable";
+import InternalLayout from "./InternalLayout";
 
 const TurnoverReport = () => {
     const [header, setHeader] = useState([]);
@@ -95,7 +96,7 @@ const TurnoverReport = () => {
     };
 
     return (
-        <Layout>
+        <InternalLayout>
             <div className="container" style={{ width: "100%" }}>
                 <CidForm handleSubmit={handleSubmitForm} />
                 {wrongPassword && (
@@ -114,7 +115,7 @@ const TurnoverReport = () => {
                     />
                 )}
             </div>
-        </Layout>
+        </InternalLayout>
     );
 };
 

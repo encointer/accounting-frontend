@@ -7,6 +7,8 @@ import JSZip from "jszip";
 import Summary from "./Summary";
 import Spinner from "./Spinner";
 import { API_URL } from "../consts";
+import InternalLayout from "./InternalLayout";
+import CidSelect from "./CidSelect";
 
 const AccountReport = () => {
     const [data, setData] = useState({});
@@ -73,7 +75,7 @@ const AccountReport = () => {
     };
 
     return (
-        <Layout>
+        <Layout title="Account Report" communityName={data.communityName}>
             <div className="container" style={{ width: "100%" }}>
                 <AddressForm handleSubmit={handleSubmitAddressForm} />
                 {wrongPassword && (
