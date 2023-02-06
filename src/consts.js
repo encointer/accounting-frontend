@@ -9,4 +9,5 @@ export const summaryLogFields = [
     "# Outgoing",
     "# Issues",
     "# Distinct Clients",
+    "Avg Transaction Value",
 ];

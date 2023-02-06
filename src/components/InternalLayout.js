@@ -17,7 +17,7 @@ const InternalLayout = ({ children }) => {
                 <div className="column is-3">
                     <Link to="/internal">
                         <img
-                            src="https://encointer.org/wp-content/uploads/2022/03/Frame-4.png"
+                            src="logos/encointerLogoLeuColors.png"
                             alt="Logo"
                         />
                     </Link>

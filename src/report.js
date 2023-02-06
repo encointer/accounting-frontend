@@ -54,6 +54,7 @@ export async function getReport(data) {
             e.numOutgoing,
             e.numIssues,
             e.numDistinctClients,
+            round(e.avgTxnValue)
         ]),
         startY: 60,
         headStyles :{fillColor : [107, 196, 232]},

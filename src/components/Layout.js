@@ -26,7 +26,7 @@ const Layout = ({ children, title, communityName }) => {
                             onError={({ currentTarget }) => {
                                 currentTarget.onerror = null; // prevents looping
                                 currentTarget.src =
-                                    "https://encointer.org/wp-content/uploads/2022/03/Frame-4.png";
+                                    "logos/encointerLogoLeuColors.png";
                             }}
                         />
                     </Link>
@@ -35,7 +35,7 @@ const Layout = ({ children, title, communityName }) => {
 
                 <div className="column is-narrow m-1">{title}</div>
             </div>
-            {children}
+        {children}
             <footer>
                 <br />
                 <br />
