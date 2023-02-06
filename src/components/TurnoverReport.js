@@ -1,4 +1,3 @@
-import "bulma/css/bulma.min.css";
 import { useEffect, useState } from "react";
 import Layout from "./Layout";
 import { downloadDataUrl, getMonthName, getTurnoverReportCsv } from "../util";

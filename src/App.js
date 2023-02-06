@@ -1,4 +1,4 @@
-import "bulma/css/bulma.min.css";
+import "./styles.scss"
 import "./Spinner.css";
 import { Routes, Route } from "react-router-dom";
 import { React } from "react";

@@ -2,26 +2,45 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { summaryLogFields } from "./consts";
 
-import encointerLogo from "./encointerLogo";
 import { round } from "./util";
-export function getReport(data) {
-    const stretch = 0.15;
+import { poppins } from "./fonts";
+const loadImage = (src) =>
+    new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+    });
+export async function getReport(data) {
     const doc = new jsPDF();
     const width = doc.internal.pageSize.getWidth();
     const height = doc.internal.pageSize.getHeight();
 
+    doc.addFileToVFS("Poppins.ttf", poppins);
+    doc.addFont("Poppins.ttf", "Poppins", "normal");
+    doc.setFont("Poppins");
     doc.setFontSize(20);
     doc.text(10, 25, `Encointer Report ${data.year}`);
     doc.setFontSize(15);
     doc.text(10, 35, `${data.name} at ${data.communityName}`);
     doc.text(10, 50, "Summary");
 
+    const logo = await loadImage(`logos/${data.communityName}.png`);
+    const logoWidth = logo.naturalWidth;
+    const logoHeight = logo.naturalHeight;
+    const margin = 2;
+    const logoEffectiveWidth = 35;
+    const logoEffectiveHeight = Math.round(
+        (logoHeight * logoEffectiveWidth) / logoWidth
+    );
+
     doc.addImage(
-        encointerLogo,
-        width - 348 * stretch,
-        0,
-        348 * stretch,
-        234 * stretch
+        logo,
+        "png",
+        width - logoEffectiveWidth - margin,
+        margin,
+        logoEffectiveWidth,
+        logoEffectiveHeight
     );
     autoTable(doc, {
         head: [summaryLogFields],
@@ -37,6 +56,8 @@ export function getReport(data) {
             e.numDistinctClients,
         ]),
         startY: 60,
+        headStyles :{fillColor : [107, 196, 232]},
+        styles: {font: "Poppins", fontSize: 8}
     });
 
     for (const monthItem of data.data) {
@@ -51,6 +72,7 @@ export function getReport(data) {
                 e.amount,
             ]),
             startY: 40,
+            headStyles :{fillColor : [107, 196, 232]}
         });
     }
 

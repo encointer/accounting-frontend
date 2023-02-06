@@ -1,4 +1,3 @@
-import "bulma/css/bulma.min.css";
 import Layout from "./Layout";
 
 const Home = () => {

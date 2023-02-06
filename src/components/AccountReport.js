@@ -1,4 +1,3 @@
-import "bulma/css/bulma.min.css";
 import { useEffect, useState } from "react";
 import AddressForm from "./AddressForm";
 import Layout from "./Layout";
@@ -50,7 +49,7 @@ const AccountReport = () => {
     }, [address, cid, token]);
 
     const handleSummaryLogDownlaod = async () => {
-        const report = getReport(data);
+        const report = await getReport(data);
         const zip = new JSZip();
         zip.file("report.pdf", report.output("blob"));
         data.data.forEach((e, idx) =>
