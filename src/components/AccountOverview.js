@@ -3,8 +3,8 @@ import { downloadDataUrl, getAccountOverviewCsv } from "../util";
 import TimestampCidForm from "./TimestampCidForm";
 import AccountOverviewTable from "./AccountOverviewTable";
 import Spinner from "./Spinner";
-import { API_URL } from "../consts";
 import InternalLayout from "./InternalLayout";
+import { apiGet } from "../api";
 
 const AccountOverview = () => {
     const [data, setData] = useState({});
@@ -17,8 +17,9 @@ const AccountOverview = () => {
     useEffect(() => {
         const fetchData = async () => {
             if (cid && timestamp && token) {
-                const res = await fetch(
-                    `${API_URL}/get-account-overview?timestamp=${timestamp}&cid=${cid}&token=${token}`
+                const res = await apiGet(
+                    `get-account-overview?timestamp=${timestamp}&cid=${cid}`,
+                    token
                 );
 
                 if (res.status === 403) {

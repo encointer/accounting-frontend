@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { downloadDataUrl, getMonthName, getTurnoverReportCsv } from "../util";
 import Spinner from "./Spinner";
-import { API_URL } from "../consts";
 import CidForm from "./CidForm";
 import TurnoverTable from "./TurnoverTable";
 import InternalLayout from "./InternalLayout";
+import { apiGet } from "../api";
 
 const TurnoverReport = () => {
     const [header, setHeader] = useState([]);
@@ -19,8 +19,9 @@ const TurnoverReport = () => {
     useEffect(() => {
         const fetchData = async () => {
             if (cid && token) {
-                const res = await fetch(
-                    `${API_URL}/get-all-accounts-data?&cid=${cid}&token=${token}`
+                const res = await apiGet(
+                    `get-all-accounts-data?&cid=${cid}`,
+                    token
                 );
                 if (res.status === 403) {
                     setWrongPassword(true);

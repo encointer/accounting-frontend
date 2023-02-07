@@ -23,7 +23,7 @@ const InternalLayout = ({ children }) => {
                 </div>
                 <div className="column"></div>
                 <div className="column is-narrow has-background-light m-1">
-                    <Link to="/account-over`view">Account Overview</Link>
+                    <Link to="/account-overview">Account Overview</Link>
                 </div>
                 <div className="column is-narrow has-background-light m-1">
                     <Link to="/turnover-report">Turnover Report</Link>

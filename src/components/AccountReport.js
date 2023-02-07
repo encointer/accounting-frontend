@@ -6,7 +6,7 @@ import { getReport } from "../report";
 import JSZip from "jszip";
 import Summary from "./Summary";
 import Spinner from "./Spinner";
-import { API_URL } from "../consts";
+import { apiGet } from "../api";
 
 const AccountReport = () => {
     const [data, setData] = useState({});
@@ -19,9 +19,11 @@ const AccountReport = () => {
     useEffect(() => {
         const fetchData = async () => {
             if (address && cid && token) {
-                const res = await fetch(
-                    `${API_URL}/get-accounting-data?&account=${address}&cid=${cid}&token=${token}`
+                const res = await apiGet(
+                    `get-accounting-data?&account=${address}&cid=${cid}`,
+                    token
                 );
+
                 if (res.status === 403) {
                     setWrongPassword(true);
                     return;
