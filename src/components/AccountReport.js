@@ -76,21 +76,17 @@ const AccountReport = () => {
 
     return (
         <Layout title="Account Report" communityName={data.communityName}>
-            <div className="container" style={{ width: "100%" }}>
-                <AddressForm handleSubmit={handleSubmitAddressForm} />
-                {wrongPassword && (
-                    <p style={{ color: "red" }}>Wrong password</p>
-                )}
-                <br />
-                <br />
-                {showSpinner && <Spinner />}
-                {Object.keys(data).length !== 0 && (
-                    <Summary
-                        data={data}
-                        handleSummaryLogDownlaod={handleSummaryLogDownlaod}
-                    />
-                )}
-            </div>
+            <AddressForm handleSubmit={handleSubmitAddressForm} />
+            {wrongPassword && <p style={{ color: "red" }}>Wrong password</p>}
+            <br />
+            <br />
+            {showSpinner && <Spinner />}
+            {Object.keys(data).length !== 0 && (
+                <Summary
+                    data={data}
+                    handleSummaryLogDownlaod={handleSummaryLogDownlaod}
+                />
+            )}
         </Layout>
     );
 };

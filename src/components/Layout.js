@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 const Layout = ({ children, title, communityName }) => {
     return (
         <div
-            className="main"
             style={{
+                width: "100vw",
                 paddingLeft: "10vw",
                 paddingRight: "10vw",
                 minHeight: "100vh",
@@ -19,7 +19,7 @@ const Layout = ({ children, title, communityName }) => {
                         <img
                             style={{
                                 marginTop: "15px",
-                                width: "150px"
+                                width: "150px",
                             }}
                             src={`logos/${communityName}.png`}
                             alt="Logo"
@@ -35,7 +35,7 @@ const Layout = ({ children, title, communityName }) => {
 
                 <div className="column is-narrow m-1">{title}</div>
             </div>
-        {children}
+            <div className="is-align-items-flex-start"> {children}</div>
             <footer>
                 <br />
                 <br />

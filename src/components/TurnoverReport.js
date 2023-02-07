@@ -97,24 +97,20 @@ const TurnoverReport = () => {
 
     return (
         <InternalLayout>
-            <div className="container" style={{ width: "100%" }}>
-                <CidForm handleSubmit={handleSubmitForm} />
-                {wrongPassword && (
-                    <p style={{ color: "red" }}>Wrong password</p>
-                )}
-                <br />
-                <br />
-                {showSpinner && <Spinner />}
-                {Object.keys(header).length !== 0 && (
-                    <TurnoverTable
-                        communityName={communityName}
-                        year={year}
-                        rows={rows}
-                        header={header}
-                        handleDownloadReport={handleDownloadReport}
-                    />
-                )}
-            </div>
+            <CidForm handleSubmit={handleSubmitForm} />
+            {wrongPassword && <p style={{ color: "red" }}>Wrong password</p>}
+            <br />
+            <br />
+            {showSpinner && <Spinner />}
+            {Object.keys(header).length !== 0 && (
+                <TurnoverTable
+                    communityName={communityName}
+                    year={year}
+                    rows={rows}
+                    header={header}
+                    handleDownloadReport={handleDownloadReport}
+                />
+            )}
         </InternalLayout>
     );
 };

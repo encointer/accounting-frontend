@@ -19,9 +19,7 @@ const AccountOverview = () => {
         const fetchData = async () => {
             if (cid && timestamp && token) {
                 const res = await fetch(
-                    `${API_URL}/get-account-overview?timestamp=${
-                        timestamp
-                    }&cid=${cid}&token=${token}`
+                    `${API_URL}/get-account-overview?timestamp=${timestamp}&cid=${cid}&token=${token}`
                 );
 
                 if (res.status === 403) {
@@ -64,29 +62,25 @@ const AccountOverview = () => {
 
     return (
         <InternalLayout>
-            <div className="container" style={{ width: "100%" }}>
-                <TimestampCidForm handleSubmit={handleSubmitForm} />
-                {wrongPassword && (
-                    <p style={{ color: "red" }}>Wrong password</p>
-                )}
-                <br />
-                <br />
-                {showSpinner && <Spinner />}
-                {Object.keys(data).length !== 0 && (
-                    <div
-                        style={{
-                            display: "flex",
-                            "align-items": "center",
-                            "justify-content": "center",
-                        }}
-                    >
-                        <AccountOverviewTable
-                            data={data.data}
-                            handleDownloadReport={handleDownloadReport}
-                        />
-                    </div>
-                )}
-            </div>
+            <TimestampCidForm handleSubmit={handleSubmitForm} />
+            {wrongPassword && <p style={{ color: "red" }}>Wrong password</p>}
+            <br />
+            <br />
+            {showSpinner && <Spinner />}
+            {Object.keys(data).length !== 0 && (
+                <div
+                    style={{
+                        display: "flex",
+                        "align-items": "center",
+                        "justify-content": "center",
+                    }}
+                >
+                    <AccountOverviewTable
+                        data={data.data}
+                        handleDownloadReport={handleDownloadReport}
+                    />
+                </div>
+            )}
         </InternalLayout>
     );
 };

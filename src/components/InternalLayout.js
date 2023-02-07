@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 const InternalLayout = ({ children }) => {
     return (
         <div
-            className="main"
             style={{
                 paddingLeft: "10vw",
                 paddingRight: "10vw",
@@ -24,13 +23,13 @@ const InternalLayout = ({ children }) => {
                 </div>
                 <div className="column"></div>
                 <div className="column is-narrow has-background-light m-1">
-                    <Link to="/account-overview">Account Overview</Link>
+                    <Link to="/account-over`view">Account Overview</Link>
                 </div>
                 <div className="column is-narrow has-background-light m-1">
                     <Link to="/turnover-report">Turnover Report</Link>
                 </div>
-            </div>
-            {children}
+            </div>{" "}
+            <div className="is-align-items-flex-start"> {children}</div>
             <footer>
                 <br />
                 <br />
