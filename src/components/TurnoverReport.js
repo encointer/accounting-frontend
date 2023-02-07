@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Layout from "./Layout";
 import { downloadDataUrl, getMonthName, getTurnoverReportCsv } from "../util";
 import Spinner from "./Spinner";
 import { API_URL } from "../consts";

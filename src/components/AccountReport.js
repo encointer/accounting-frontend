@@ -7,8 +7,6 @@ import JSZip from "jszip";
 import Summary from "./Summary";
 import Spinner from "./Spinner";
 import { API_URL } from "../consts";
-import InternalLayout from "./InternalLayout";
-import CidSelect from "./CidSelect";
 
 const AccountReport = () => {
     const [data, setData] = useState({});
