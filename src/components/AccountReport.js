@@ -41,6 +41,13 @@ const AccountReport = () => {
                     //     reportData.data[0],
                     //     reportData.data[0],
                     //     reportData.data[0],
+                    //     reportData.data[0],
+                    //     reportData.data[0],
+                    //     reportData.data[0],
+                    //     reportData.data[0],
+                    //     reportData.data[0],
+                    //     reportData.data[0],
+                    //     reportData.data[0],
                     // ];
                     setData(reportData);
                     setShowSpinner(false);
@@ -82,10 +89,12 @@ const AccountReport = () => {
             <br />
             {showSpinner && <Spinner />}
             {Object.keys(data).length !== 0 && (
-                <Summary
-                    data={data}
-                    handleSummaryLogDownlaod={handleSummaryLogDownlaod}
-                />
+                <div>
+                    <Summary
+                        data={data}
+                        handleSummaryLogDownlaod={handleSummaryLogDownlaod}
+                    />
+                </div>
             )}
         </Layout>
     );

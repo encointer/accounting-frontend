@@ -1,5 +1,6 @@
-import { summaryLogFields } from "../consts";
-import SummaryLogRow from "./SummaryLogRow";
+import AccountReportChart from "./AccountReportChart";
+import AccountReportTable from "./AccountReportTable";
+
 
 const Summary = ({ data, handleSummaryLogDownlaod }) => {
     return (
@@ -9,20 +10,16 @@ const Summary = ({ data, handleSummaryLogDownlaod }) => {
             >{`${data.name} at ${data.communityName} ${data.year}`}</p>
             <br />
             <br />
-            <table className="table">
-                <thead>
-                    <tr>
-                        {summaryLogFields.map((val, i) => (
-                            <th key={i}>{val}</th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.data.map((row, i) => (
-                        <SummaryLogRow {...row} key={i} />
-                    ))}
-                </tbody>
-            </table>
+            <p style={{ fontSize: "2vh" }}>Revenue & Transaction Summary</p>
+            <br/>
+            <div style={{width: "min(80vw, 900px)"}}>
+                <AccountReportChart data={data} />
+            </div>
+            <br />
+            <br />
+            <p style={{ fontSize: "2vh" }}>Report</p>
+            <br />
+            <AccountReportTable data={data}/>
             <button
                 className="button is-link"
                 onClick={handleSummaryLogDownlaod}

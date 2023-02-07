@@ -16,3 +16,10 @@ $text: #000000;
 
 
 @import "../node_modules/bulma/bulma";
+
+
+
+
+td ,th{
+    font-size: min(1.3vw, 15px);
+}
