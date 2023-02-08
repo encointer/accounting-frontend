@@ -46,7 +46,7 @@ export function getReport(data) {
         autoTable(doc, {
             head: [["Timestamp", "Counterparty", "Amount"]],
             body: monthItem.txnLog.map((e) => [
-                new Date(e.timestamp * 1000).toUTCString(),
+                new Date(e.timestamp).toUTCString(),
                 e.counterParty,
                 e.amount,
             ]),
