@@ -28,6 +28,9 @@ const InternalLayout = ({ children }) => {
                 <div className="column is-narrow has-background-light m-1">
                     <Link to="/turnover-report">Turnover Report</Link>
                 </div>
+                <div className="column is-narrow has-background-light m-1">
+                    <Link to="/account-tokens">Tokens</Link>
+                </div>
             </div>{" "}
             <div className="is-align-items-flex-start"> {children}</div>
             <footer>
