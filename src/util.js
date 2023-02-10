@@ -55,6 +55,20 @@ export function getAccountOverviewCsv(data) {
     return csvString;
 }
 
+export function getRewardsReportCsv(data) {
+    const csvString = [
+        ["Cindex", "# Particiants", "Total Rewards"],
+        ...Object.entries(data).map(([cindex, item]) => [
+            cindex,
+            item.numParticipants,
+            item.totalRewards,
+        ]),
+    ]
+        .map((e) => e.join(","))
+        .join("\n");
+    return csvString;
+}
+
 export function getTurnoverReportCsv(header, rows) {
     const csvString = [["Month"].concat(header), ...rows]
         .map((e) => e.join(","))
