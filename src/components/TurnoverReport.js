@@ -20,7 +20,7 @@ const TurnoverReport = () => {
         const fetchData = async () => {
             if (cid && token) {
                 const res = await apiGet(
-                    `get-all-accounts-data?&cid=${cid}`,
+                    `all-accounts-data?&cid=${cid}`,
                     token
                 );
                 if (res.status === 403) {

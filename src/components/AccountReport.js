@@ -20,7 +20,7 @@ const AccountReport = () => {
         const fetchData = async () => {
             if (address && cid && token) {
                 const res = await apiGet(
-                    `get-accounting-data?&account=${address}&cid=${cid}`,
+                    `accounting-data?&account=${address}&cid=${cid}`,
                     token
                 );
 

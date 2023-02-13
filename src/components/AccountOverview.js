@@ -18,7 +18,7 @@ const AccountOverview = () => {
         const fetchData = async () => {
             if (cid && timestamp && token) {
                 const res = await apiGet(
-                    `get-account-overview?timestamp=${timestamp}&cid=${cid}`,
+                    `account-overview?timestamp=${timestamp}&cid=${cid}`,
                     token
                 );
 

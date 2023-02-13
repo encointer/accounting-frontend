@@ -14,7 +14,7 @@ const AccountTokens = () => {
     useEffect(() => {
         const fetchData = async () => {
             if (token) {
-                const res = await apiGet(`get-tokens`, token);
+                const res = await apiGet(`-tokens`, token);
 
                 if (res.status === 403) {
                     setWrongPassword(true);
