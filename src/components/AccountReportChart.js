@@ -15,28 +15,48 @@ const AccountReportChart = ({ data }) => {
                         type: "bar",
                         label: "Revenue",
                         data: data.data.map((e) => round(e.sumIncoming)),
-                        borderColor: "rgb(255, 99, 132)",
-                        backgroundColor: "rgba(107, 196, 232, 0.3)",
+                        borderColor: "rgb(255, 99, 132, 0.4)",
+                        backgroundColor: "rgba(107, 196, 232, 0.4)",
                         yAxisID: "y",
+                        order: 2,
+                        stack: "Stack 0",
+                    },
+
+                    {
+                        type: "bar",
+                        label: "Balance-Revenue",
+                        data: data.data.map((e) =>
+                            round(e.balance - e.sumIncoming)
+                        ),
+                        fill: false,
+                        borderColor: "rgba(70, 130, 153, 0.4)",
+                        backgroundColor: "rgba(70, 130, 153, 0.4)",
+                        yAxisID: "y",
+                        stack: "Stack 0",
                         order: 1,
                     },
+
                     {
                         type: "line",
                         label: "Number of customers",
                         data: data.data.map((e) => e.numDistinctClients),
                         fill: false,
-                        borderColor: "rgba(107, 196, 232)",
-                        backgroundColor: "rgba(107, 196, 232)",
+                        borderColor: "rgba(232, 143, 107)",
+                        backgroundColor: "rgba(232, 143, 107)",
                         yAxisID: "y1",
+                        order: 0,
+                        stack: "Stack 1",
                     },
                     {
                         type: "line",
                         label: "Number of transactions",
                         data: data.data.map((e) => e.numIncoming),
                         fill: false,
-                        borderColor: "#E88F6B",
-                        backgroundColor: "#E88F6B",
+                        borderColor: "rgba(107, 196, 232)",
+                        backgroundColor: "rgba(107, 196, 232)",
                         yAxisID: "y1",
+                        order: 0,
+                        stack: "Stack 2",
                     },
                 ],
             }}
@@ -54,11 +74,29 @@ const AccountReportChart = ({ data }) => {
                                 family: "Poppins",
                             },
                         },
+                        // disable the hiding of the revenue bar chart
+                        // as the balance without the stacked revenue is
+                        // not meaningful data
+                        onClick: function (e, legendItem) {
+                            if (legendItem.text === "Revenue") {
+                                e.stopPropagation();
+                                return;
+                            }
+                            var index = legendItem.datasetIndex;
+                            var ci = this.chart;
+                            var meta = ci.getDatasetMeta(index);
+                            meta.hidden =
+                                meta.hidden === null
+                                    ? !ci.data.datasets[index].hidden
+                                    : null;
+                            ci.update();
+                        },
                     },
                 },
                 scales: {
                     x: {
                         type: "category",
+                        stacked: true,
                         title: {
                             text: "Month",
                             display: true,
@@ -77,9 +115,10 @@ const AccountReportChart = ({ data }) => {
 
                     y: {
                         beginAtZero: true,
+                        stacked: true,
                         type: "linear",
                         title: {
-                            text: "Revenue",
+                            text: "Revenue/Balance",
                             display: true,
                             font: {
                                 size: 15,
@@ -89,9 +128,10 @@ const AccountReportChart = ({ data }) => {
                     },
                     y1: {
                         beginAtZero: true,
+                        stacked: true,
                         position: "right",
                         title: {
-                            text: "# customers/transactions",
+                            text: "# Customers/Transactions",
                             display: true,
                             font: {
                                 size: 15,
