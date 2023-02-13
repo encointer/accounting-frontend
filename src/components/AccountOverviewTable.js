@@ -19,7 +19,10 @@ const AccountOverviewTable = ({ data, handleDownloadReport }) => {
                 <tbody>
                     {data.map((row, i) => (
                         <tr key={i}>
-                            <td>{row.account}</td>
+                            <td>
+                                {row.account}
+                                {row.accountName && <p>({row.accountName})</p>}
+                            </td>
                             <td>{round(row.balance)}</td>
                         </tr>
                     ))}
