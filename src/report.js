@@ -54,14 +54,53 @@ export async function getReport(data) {
             e.numOutgoing,
             e.numIssues,
             e.numDistinctClients,
-            round(e.avgTxnValue)
+            round(e.avgTxnValue),
         ]),
         startY: 60,
-        headStyles :{fillColor : [107, 196, 232]},
-        styles: {font: "Poppins", fontSize: 8}
+        headStyles: { fillColor: [107, 196, 232] },
+        styles: { font: "Poppins", fontSize: 8 },
     });
 
     for (const monthItem of data.data) {
+        doc.addPage();
+        doc.setFontSize(20);
+        doc.text(10, 25, `${monthItem.month} ${data.year} Daily Digest`);
+
+        autoTable(doc, {
+            head: [
+                [
+                    "Day",
+                    "# Incoming",
+                    "Sum Incoming",
+                    "# Outgoing",
+                    "Sum Outgoing",
+                    "# Issuance",
+                    "Sum Issuance",
+                    "# Distinct Clients",
+                    "Avg Transaction Value",
+                ],
+            ],
+            body: Object.entries(monthItem.dailyDigest).map(
+                ([dayString, data]) => [
+                    dayString,
+                    data.numIncoming,
+                    round(data.sumIncoming),
+                    data.numOutgoing,
+                    round(data.sumOutgoing),
+                    data.numIssues,
+                    round(data.sumIssues),
+                    data.numDistinctClients,
+                    round(data.avgTxnValue),
+                ]
+            ),
+            columnStyles: {
+                0: { cellWidth: 25 },
+            },
+            startY: 40,
+            headStyles: { fillColor: [107, 196, 232] },
+            styles: { font: "Poppins", fontSize: 8 },
+        });
+
         doc.addPage();
         doc.setFontSize(20);
         doc.text(10, 25, `${monthItem.month} ${data.year} Detailed Report`);
@@ -73,7 +112,8 @@ export async function getReport(data) {
                 e.amount,
             ]),
             startY: 40,
-            headStyles :{fillColor : [107, 196, 232]}
+            headStyles: { fillColor: [107, 196, 232] },
+            styles: { font: "Poppins", fontSize: 8 },
         });
     }
 
