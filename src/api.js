@@ -5,6 +5,7 @@ export async function apiGet(path, token) {
         headers: new Headers({
             "Access-Token": token,
         }),
+        credentials: "include",
     });
     return res;
 }

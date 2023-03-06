@@ -1,6 +1,42 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { apiGet } from "../api";
+import { API_URL } from "../consts";
 
 const InternalLayout = ({ children }) => {
+    const [me, setMe] = useState(async () => {
+        const res = await apiGet("auth/me");
+        if ([401, 403].includes(res.status)) {
+            setMe(null);
+            return;
+        }
+        const me = await res.json();
+        console.log(me);
+        setMe(me);
+    });
+
+    const authenticate = async (e) => {
+        e.preventDefault();
+        const res = await fetch(`${API_URL}/auth/authenticate`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                address: e.target.form[0].value,
+                password: e.target.form[1].value,
+            }),
+        });
+        if ([401, 403].includes(res.status)) {
+            return;
+        }
+        const me = await res.json();
+        console.log(me);
+        setMe(me);
+    };
+
     return (
         <div
             style={{
@@ -35,7 +71,33 @@ const InternalLayout = ({ children }) => {
                     <Link to="/account-tokens">Tokens</Link>
                 </div>
             </div>{" "}
-            <div className="is-align-items-flex-start"> {children}</div>
+            {me?.isAdmin && (
+                <div className="is-align-items-flex-start"> {children}</div>
+            )}
+            {!me?.isAdmin && (
+                <form>
+                    <h1>Login</h1>
+                    <div>
+                        <label>Username : </label>
+                        <input
+                            type="text"
+                            placeholder="Enter Username"
+                            name="username"
+                            required
+                        />
+                        <label>Password : </label>
+                        <input
+                            type="password"
+                            placeholder="Enter Password"
+                            name="password"
+                            required
+                        />
+                        <button type="submit" onClick={authenticate}>
+                            Login
+                        </button>
+                    </div>
+                </form>
+            )}
             <footer>
                 <br />
                 <br />

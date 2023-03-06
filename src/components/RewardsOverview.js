@@ -19,7 +19,7 @@ const RewardsOverview = () => {
     useEffect(() => {
         const fetchData = async () => {
             if (cid && token) {
-                const res = await apiGet(`rewards-data?&cid=${cid}`, token);
+                const res = await apiGet(`accounting/rewards-data?&cid=${cid}`, token);
                 if (res.status === 403) {
                     setWrongPassword(true);
                     return;
