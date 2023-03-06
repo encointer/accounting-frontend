@@ -9,28 +9,23 @@ import { apiGet } from "../api";
 const TurnoverReport = () => {
     const [header, setHeader] = useState([]);
     const [rows, setRows] = useState([]);
-    const [token, setToken] = useState("");
     const [communityName, setCommunityName] = useState("");
     const [year, setYear] = useState("");
     const [cid, setCid] = useState("");
-    const [wrongPassword, setWrongPassword] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
-            if (cid && token) {
+            if (cid) {
                 const res = await apiGet(
-                    `accounting/all-accounts-data?&cid=${cid}`,
-                    token
+                    `accounting/all-accounts-data?&cid=${cid}`
                 );
                 if (res.status === 403) {
-                    setWrongPassword(true);
                     return;
                 }
 
                 if (res.ok) {
                     const reportData = await res.json();
-                    setWrongPassword(false);
                     setShowSpinner(false);
                     setCommunityName(reportData.communityName);
                     setYear(reportData.year);
@@ -75,7 +70,7 @@ const TurnoverReport = () => {
             }
         };
         fetchData().catch(console.error);
-    }, [cid, token]);
+    }, [cid]);
 
     const handleDownloadReport = async () => {
         const csv = getTurnoverReportCsv(header, rows);
@@ -91,14 +86,12 @@ const TurnoverReport = () => {
         e.preventDefault();
         setHeader([]);
         setShowSpinner(true);
-        setToken(e.target.form.token.value);
         setCid(e.target.form.cid.value);
     };
 
     return (
         <InternalLayout>
             <CidForm handleSubmit={handleSubmitForm} />
-            {wrongPassword && <p style={{ color: "red" }}>Wrong password</p>}
             <br />
             <br />
             {showSpinner && <Spinner />}

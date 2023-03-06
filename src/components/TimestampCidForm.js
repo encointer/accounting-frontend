@@ -24,16 +24,6 @@ const TimestampCidForm = ({ handleSubmit }) => {
                     </div>
                 </div>
                 <CidSelect />
-                <div className="field">
-                    <label>Password</label>
-                    <div className="control">
-                        <input
-                            className="input"
-                            type="password"
-                            name="token"
-                        />
-                    </div>
-                </div>
 
                 <div className="field is-grouped">
                     <div className="control">

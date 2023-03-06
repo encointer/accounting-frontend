@@ -10,31 +10,27 @@ import { apiGet } from "../api";
 import RewardsTable from "./RewardsTable";
 
 const RewardsOverview = () => {
-    const [token, setToken] = useState("");
     const [data, setData] = useState("");
     const [cid, setCid] = useState("");
-    const [wrongPassword, setWrongPassword] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
-            if (cid && token) {
-                const res = await apiGet(`accounting/rewards-data?&cid=${cid}`, token);
+            if (cid) {
+                const res = await apiGet(`accounting/rewards-data?&cid=${cid}`);
                 if (res.status === 403) {
-                    setWrongPassword(true);
                     return;
                 }
 
                 if (res.ok) {
                     const reportData = await res.json();
-                    setWrongPassword(false);
                     setShowSpinner(false);
                     setData(reportData);
                 }
             }
         };
         fetchData().catch(console.error);
-    }, [cid, token]);
+    }, [cid]);
 
     const handleDownloadReport = async () => {
         const csv = getRewardsReportCsv(data.data);
@@ -49,14 +45,12 @@ const RewardsOverview = () => {
     const handleSubmitForm = (e) => {
         e.preventDefault();
         setShowSpinner(true);
-        setToken(e.target.form.token.value);
         setCid(e.target.form.cid.value);
     };
 
     return (
         <InternalLayout>
             <CidForm handleSubmit={handleSubmitForm} />
-            {wrongPassword && <p style={{ color: "red" }}>Wrong password</p>}
             <br />
             <br />
             {showSpinner && <Spinner />}

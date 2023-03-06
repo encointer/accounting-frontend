@@ -9,21 +9,17 @@ import { apiGet } from "../api";
 const AccountOverview = () => {
     const [data, setData] = useState({});
     const [cid, setCid] = useState("");
-    const [token, setToken] = useState("");
     const [timestamp, setTimestamp] = useState(0);
     const [showSpinner, setShowSpinner] = useState(false);
-    const [wrongPassword, setWrongPassword] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
-            if (cid && timestamp && token) {
+            if (cid && timestamp) {
                 const res = await apiGet(
-                    `accounting/account-overview?timestamp=${timestamp}&cid=${cid}`,
-                    token
+                    `accounting/account-overview?timestamp=${timestamp}&cid=${cid}`
                 );
 
                 if (res.status === 403) {
-                    setWrongPassword(true);
                     return;
                 }
 
@@ -31,13 +27,12 @@ const AccountOverview = () => {
                     const d = await res.json();
                     d.data.sort((a, b) => b.balance - a.balance);
                     setData(d);
-                    setWrongPassword(false);
                     setShowSpinner(false);
                 }
             }
         };
         fetchData().catch(console.error);
-    }, [cid, timestamp, token]);
+    }, [cid, timestamp]);
 
     const handleDownloadReport = async () => {
         const csv = getAccountOverviewCsv(data.data);
@@ -56,14 +51,12 @@ const AccountOverview = () => {
         setData({});
         setShowSpinner(true);
         setTimestamp(new Date(e.target.form[0].value).getTime());
-        setToken(e.target.form.token.value);
         setCid(e.target.form.cid.value);
     };
 
     return (
         <InternalLayout>
             <TimestampCidForm handleSubmit={handleSubmitForm} />
-            {wrongPassword && <p style={{ color: "red" }}>Wrong password</p>}
             <br />
             <br />
             {showSpinner && <Spinner />}

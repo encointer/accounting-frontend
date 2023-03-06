@@ -77,21 +77,30 @@ const InternalLayout = ({ children }) => {
             {!me?.isAdmin && (
                 <form>
                     <h1>Login</h1>
+                    <br/>
                     <div>
+                        <div>
                         <label>Username : </label>
+                        <br/>
                         <input
                             type="text"
-                            placeholder="Enter Username"
+                            placeholder="Username"
                             name="username"
                             required
                         />
+                        </div>
+                        <br/>
+                        <div>
                         <label>Password : </label>
+                        <br/>
                         <input
                             type="password"
-                            placeholder="Enter Password"
+                            placeholder="Password"
                             name="password"
                             required
                         />
+                        </div>
+                        <br/>
                         <button type="submit" onClick={authenticate}>
                             Login
                         </button>
