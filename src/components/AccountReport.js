@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import AddressForm from "./AddressForm";
+import { useContext, useEffect, useState } from "react";
 import Layout from "./Layout";
 import { downloadDataUrl, getMonthName, getTxnLogCsv } from "../util";
 import { getReport } from "../report";
@@ -7,31 +6,28 @@ import JSZip from "jszip";
 import Summary from "./Summary";
 import Spinner from "./Spinner";
 import { apiGet } from "../api";
+import CidForm from "./CidForm";
+import { MeContext } from "../App";
 
 const AccountReport = () => {
+    const { me } = useContext(MeContext);
     const [data, setData] = useState({});
-    const [address, setAddress] = useState("");
-    const [token, setToken] = useState("");
     const [cid, setCid] = useState("");
-    const [wrongPassword, setWrongPassword] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
-            if (address && cid && token) {
+            if (cid) {
                 const res = await apiGet(
-                    `accounting/accounting-data?&account=${address}&cid=${cid}`,
-                    token
+                    `accounting/accounting-data?&account=${me.address}&cid=${cid}`
                 );
 
                 if (res.status === 403) {
-                    setWrongPassword(true);
                     return;
                 }
 
                 if (res.ok) {
                     const reportData = await res.json();
-                    setWrongPassword(false);
                     reportData.data.forEach(
                         (e) => (e.month = getMonthName(e.month))
                     );
@@ -55,7 +51,7 @@ const AccountReport = () => {
             }
         };
         fetchData().catch(console.error);
-    }, [address, cid, token]);
+    }, [cid, me.address]);
 
     const handleSummaryLogDownlaod = async () => {
         const report = await getReport(data);
@@ -76,15 +72,12 @@ const AccountReport = () => {
         e.preventDefault();
         setData({});
         setShowSpinner(true);
-        setAddress(e.target.form.address.value);
-        setToken(e.target.form.token.value);
         setCid(e.target.form.cid.value);
     };
 
     return (
         <Layout title="Account Report" communityName={data.communityName}>
-            <AddressForm handleSubmit={handleSubmitAddressForm} />
-            {wrongPassword && <p style={{ color: "red" }}>Wrong password</p>}
+            <CidForm handleSubmit={handleSubmitAddressForm} />
             <br />
             <br />
             {showSpinner && <Spinner />}

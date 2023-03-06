@@ -1,6 +1,11 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { MeContext } from "../App";
+import LoginForm from "./LoginForm";
+import LogoutButton from "./LogoutButton";
 
 const Layout = ({ children, title, communityName }) => {
+    const { me, setMe } = useContext(MeContext);
     return (
         <div
             style={{
@@ -32,10 +37,14 @@ const Layout = ({ children, title, communityName }) => {
                     </Link>
                 </div>
                 <div className="column"></div>
-
                 <div className="column is-narrow m-1">{title}</div>
+                <LogoutButton me={me} />
             </div>
-            <div className="is-align-items-flex-start"> {children}</div>
+            {me?.address && (
+                <div className="is-align-items-flex-start"> {children}</div>
+            )}
+            {!me?.address && <LoginForm setMe={setMe} />}
+
             <footer>
                 <br />
                 <br />

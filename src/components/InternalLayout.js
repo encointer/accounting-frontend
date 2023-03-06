@@ -1,42 +1,11 @@
-import { useState } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
-import { apiGet } from "../api";
-import { API_URL } from "../consts";
+import { MeContext } from "../App";
+import LoginForm from "./LoginForm";
+import LogoutButton from "./LogoutButton";
 
 const InternalLayout = ({ children }) => {
-    const [me, setMe] = useState(async () => {
-        const res = await apiGet("auth/me");
-        if ([401, 403].includes(res.status)) {
-            setMe(null);
-            return;
-        }
-        const me = await res.json();
-        console.log(me);
-        setMe(me);
-    });
-
-    const authenticate = async (e) => {
-        e.preventDefault();
-        const res = await fetch(`${API_URL}/auth/authenticate`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                address: e.target.form[0].value,
-                password: e.target.form[1].value,
-            }),
-        });
-        if ([401, 403].includes(res.status)) {
-            return;
-        }
-        const me = await res.json();
-        console.log(me);
-        setMe(me);
-    };
-
+    const { me, setMe } = useContext(MeContext);
     return (
         <div
             style={{
@@ -70,43 +39,12 @@ const InternalLayout = ({ children }) => {
                 <div className="column is-narrow has-background-light m-1">
                     <Link to="/account-tokens">Tokens</Link>
                 </div>
+                <LogoutButton me={me}/>
             </div>{" "}
             {me?.isAdmin && (
                 <div className="is-align-items-flex-start"> {children}</div>
             )}
-            {!me?.isAdmin && (
-                <form>
-                    <h1>Login</h1>
-                    <br/>
-                    <div>
-                        <div>
-                        <label>Username : </label>
-                        <br/>
-                        <input
-                            type="text"
-                            placeholder="Username"
-                            name="username"
-                            required
-                        />
-                        </div>
-                        <br/>
-                        <div>
-                        <label>Password : </label>
-                        <br/>
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            name="password"
-                            required
-                        />
-                        </div>
-                        <br/>
-                        <button type="submit" onClick={authenticate}>
-                            Login
-                        </button>
-                    </div>
-                </form>
-            )}
+            {!me?.isAdmin && <LoginForm setMe={setMe} />}
             <footer>
                 <br />
                 <br />
