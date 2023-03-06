@@ -27,7 +27,7 @@ const InternalLayout = ({ children }) => {
                     </Link>
                 </div>
                 {me.isAdmin && (
-                    <div>
+                    <>
                         <div className="column"></div>
                         <div className="column is-narrow has-background-light m-1">
                             <Link to="/account-overview">Account Overview</Link>
@@ -42,7 +42,7 @@ const InternalLayout = ({ children }) => {
                             <Link to="/login-as">Login as</Link>
                         </div>
                         <LogoutButton me={me} />
-                    </div>
+                    </>
                 )}
             </div>{" "}
             {me?.isAdmin && (
