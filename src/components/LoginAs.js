@@ -5,6 +5,7 @@ const LoginAs = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         await apiGet(`auth/login-as?account=${e.target.form[0].value}`);
+        window.location.href = '/';
     };
 
     return (

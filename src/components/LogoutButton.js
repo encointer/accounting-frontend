@@ -13,7 +13,7 @@ function LogoutButton({ me }) {
                         }}
                     >
                         Logout
-                    </Link>
+                </Link>
                 </div>
             )}
         </div>

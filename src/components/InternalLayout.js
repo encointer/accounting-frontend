@@ -26,20 +26,24 @@ const InternalLayout = ({ children }) => {
                         />
                     </Link>
                 </div>
-                <div className="column"></div>
-                <div className="column is-narrow has-background-light m-1">
-                    <Link to="/account-overview">Account Overview</Link>
-                </div>
-                <div className="column is-narrow has-background-light m-1">
-                    <Link to="/turnover-report">Turnover Report</Link>
-                </div>
-                <div className="column is-narrow has-background-light m-1">
-                    <Link to="/rewards-report">Rewards Report</Link>
-                </div>
-                <div className="column is-narrow has-background-light m-1">
-                    <Link to="/login-as">Login as</Link>
-                </div>
-                <LogoutButton me={me}/>
+                {me.isAdmin && (
+                    <div>
+                        <div className="column"></div>
+                        <div className="column is-narrow has-background-light m-1">
+                            <Link to="/account-overview">Account Overview</Link>
+                        </div>
+                        <div className="column is-narrow has-background-light m-1">
+                            <Link to="/turnover-report">Turnover Report</Link>
+                        </div>
+                        <div className="column is-narrow has-background-light m-1">
+                            <Link to="/rewards-report">Rewards Report</Link>
+                        </div>
+                        <div className="column is-narrow has-background-light m-1">
+                            <Link to="/login-as">Login as</Link>
+                        </div>
+                        <LogoutButton me={me} />
+                    </div>
+                )}
             </div>{" "}
             {me?.isAdmin && (
                 <div className="is-align-items-flex-start"> {children}</div>
