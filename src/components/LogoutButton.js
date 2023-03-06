@@ -7,8 +7,10 @@ function LogoutButton({ me }) {
             {me?.address && (
                 <div className="column is-narrow has-background-light m-1">
                     <Link
-                        onClick={() => {
-                            apiGet("auth/logout");
+                        onClick={async () => {
+                            await apiGet("auth/logout");
+                            con
+                            window.location.href = '/';
                         }}
                     >
                         Logout

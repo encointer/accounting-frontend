@@ -19,7 +19,7 @@ const InternalLayout = ({ children }) => {
         >
             <div className="columns is-vcentered">
                 <div className="column is-3">
-                    <Link to="/internal">
+                    <Link to="/">
                         <img
                             src="logos/encointerLogoLeuColors.png"
                             alt="Logo"
@@ -37,7 +37,7 @@ const InternalLayout = ({ children }) => {
                     <Link to="/rewards-report">Rewards Report</Link>
                 </div>
                 <div className="column is-narrow has-background-light m-1">
-                    <Link to="/account-tokens">Tokens</Link>
+                    <Link to="/login-as">Login as</Link>
                 </div>
                 <LogoutButton me={me}/>
             </div>{" "}

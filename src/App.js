@@ -9,6 +9,7 @@ import InternalLayout from "./components/InternalLayout";
 import AccountTokens from "./components/AccountTokens";
 import RewardsOverview from "./components/RewardsOverview";
 import { apiGet } from "./api";
+import LoginAs from "./components/LoginAs";
 
 export const MeContext = createContext(null);
 
@@ -51,6 +52,7 @@ function App() {
                         element={<RewardsOverview />}
                     />
                     <Route path="/account-report" element={<AccountReport />} />
+                    <Route path="/login-as" element={<LoginAs />} />
                 </Routes>
             </div>
         </MeContext.Provider>
