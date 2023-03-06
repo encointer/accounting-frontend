@@ -9,7 +9,6 @@ function LogoutButton({ me }) {
                     <Link
                         onClick={async () => {
                             await apiGet("auth/logout");
-                            con
                             window.location.href = '/';
                         }}
                     >
