@@ -6,10 +6,10 @@ import AccountReport from "./components/AccountReport";
 import AccountOverview from "./components/AccountOverview";
 import TurnoverReport from "./components/TurnoverReport";
 import InternalLayout from "./components/InternalLayout";
-import AccountTokens from "./components/AccountTokens";
 import RewardsOverview from "./components/RewardsOverview";
 import { apiGet } from "./api";
 import LoginAs from "./components/LoginAs";
+import AddUser from "./components/AddUser";
 
 export const MeContext = createContext(null);
 
@@ -46,11 +46,11 @@ function App() {
                         path="/turnover-report"
                         element={<TurnoverReport />}
                     />
-                    <Route path="/account-tokens" element={<AccountTokens />} />
                     <Route
                         path="/rewards-report"
                         element={<RewardsOverview />}
                     />
+                    <Route path="/add-user" element={<AddUser />} />
                     <Route path="/account-report" element={<AccountReport />} />
                     <Route path="/login-as" element={<LoginAs />} />
                 </Routes>

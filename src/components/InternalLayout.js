@@ -39,6 +39,9 @@ const InternalLayout = ({ children }) => {
                             <Link to="/rewards-report">Rewards Report</Link>
                         </div>
                         <div className="column is-narrow has-background-light m-1">
+                            <Link to="/add-user">Add User</Link>
+                        </div>
+                        <div className="column is-narrow has-background-light m-1">
                             <Link to="/login-as">Login as</Link>
                         </div>
                         <LogoutButton me={me} />

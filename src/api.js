@@ -9,3 +9,16 @@ export async function apiGet(path, token) {
     });
     return res;
 }
+
+export async function apiPost(path, body) {
+    const res = await fetch(`${API_URL}/${path}`, {
+        method: "POST",
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+        credentials: "include",
+    });
+    return res;
+}
