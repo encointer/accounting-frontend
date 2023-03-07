@@ -1,6 +1,6 @@
 import { API_URL } from "../consts";
 
-function LoginForm({setMe}) {
+function LoginForm({ setMe }) {
     const authenticate = async (e) => {
         e.preventDefault();
         const res = await fetch(`${API_URL}/auth/authenticate`, {
@@ -50,7 +50,11 @@ function LoginForm({setMe}) {
                     />
                 </div>
                 <br />
-                <button type="submit" onClick={authenticate}>
+                <button
+                    className="button is-link"
+                    type="submit"
+                    onClick={authenticate}
+                >
                     Login
                 </button>
             </div>
