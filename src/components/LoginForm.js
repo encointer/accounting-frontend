@@ -29,11 +29,11 @@ function LoginForm({ setMe }) {
             <br />
             <div>
                 <div>
-                    <label>Username : </label>
+                    <label>Address : </label>
                     <br />
                     <input
                         type="text"
-                        placeholder="Username"
+                        placeholder="Address"
                         name="username"
                         required
                     />
