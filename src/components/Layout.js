@@ -36,9 +36,17 @@ const Layout = ({ children, title, communityName }) => {
                         />
                     </Link>
                 </div>
-                <div className="column"></div>
-                <div className="column is-narrow m-1">{title}</div>
-                <LogoutButton me={me} />
+
+                {me?.address && (
+                    <>
+                        <div className="column"></div>
+                        <div className="column is-narrow m-1">{title}</div>
+                        <div className="column is-narrow has-background-light m-1">
+                            <Link to="/change-password">Change Password</Link>
+                        </div>
+                        <LogoutButton me={me} />
+                    </>
+                )}
             </div>
             {me?.address && (
                 <div className="is-align-items-flex-start"> {children}</div>

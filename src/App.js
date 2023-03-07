@@ -10,6 +10,7 @@ import RewardsOverview from "./components/RewardsOverview";
 import { apiGet } from "./api";
 import LoginAs from "./components/LoginAs";
 import AddUser from "./components/AddUser";
+import ChangePassword from "./components/ChangePassword";
 
 export const MeContext = createContext(null);
 
@@ -23,6 +24,7 @@ function App() {
         const me = await res.json();
         console.log(me);
         setMe(me);
+        return me;
     });
 
     return (
@@ -53,6 +55,7 @@ function App() {
                     <Route path="/add-user" element={<AddUser />} />
                     <Route path="/account-report" element={<AccountReport />} />
                     <Route path="/login-as" element={<LoginAs />} />
+                    <Route path="/change-password" element={<ChangePassword />} />
                 </Routes>
             </div>
         </MeContext.Provider>
