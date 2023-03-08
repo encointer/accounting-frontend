@@ -2,10 +2,9 @@ import { Scatter } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 import { round } from "../util";
 
-const AccountReportChart = ({ data }) => {
+const AccountReportRevenueChart = ({ data }) => {
     Chart.register(...registerables);
 
-    console.log(data);
     return (
         <Scatter
             data={{
@@ -24,7 +23,7 @@ const AccountReportChart = ({ data }) => {
 
                     {
                         type: "bar",
-                        label: "Balance-Revenue",
+                        label: "Balance",
                         data: data.data.map((e) =>
                             round(e.balance - e.sumIncoming)
                         ),
@@ -35,35 +34,12 @@ const AccountReportChart = ({ data }) => {
                         stack: "Stack 0",
                         order: 1,
                     },
-
-                    {
-                        type: "line",
-                        label: "Number of customers",
-                        data: data.data.map((e) => e.numDistinctClients),
-                        fill: false,
-                        borderColor: "rgba(232, 143, 107)",
-                        backgroundColor: "rgba(232, 143, 107)",
-                        yAxisID: "y1",
-                        order: 0,
-                        stack: "Stack 1",
-                    },
-                    {
-                        type: "line",
-                        label: "Number of transactions",
-                        data: data.data.map((e) => e.numIncoming),
-                        fill: false,
-                        borderColor: "rgba(107, 196, 232)",
-                        backgroundColor: "rgba(107, 196, 232)",
-                        yAxisID: "y1",
-                        order: 0,
-                        stack: "Stack 2",
-                    },
                 ],
             }}
             options={{
                 plugins: {
                     title: {
-                        text: "Revenue/Transaction Summary",
+                        text: "Revenue Summary",
                         display: false,
                     },
                     legend: {
@@ -79,7 +55,7 @@ const AccountReportChart = ({ data }) => {
                         // not meaningful data
                         onClick: function (e, legendItem) {
                             if (legendItem.text === "Revenue") {
-                                e.stopPropagation();
+                                //e.stopPropagation();
                                 return;
                             }
                             var index = legendItem.datasetIndex;
@@ -126,24 +102,10 @@ const AccountReportChart = ({ data }) => {
                             },
                         },
                     },
-                    y1: {
-                        beginAtZero: true,
-                        stacked: true,
-                        position: "right",
-                        title: {
-                            text: "# Customers/Transactions",
-                            display: true,
-                            font: {
-                                size: 15,
-                                family: "Poppins",
-                            },
-                        },
-                        type: "linear",
-                    },
                 },
             }}
         ></Scatter>
     );
 };
 
-export default AccountReportChart;
+export default AccountReportRevenueChart;

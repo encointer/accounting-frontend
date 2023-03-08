@@ -1,5 +1,6 @@
-import AccountReportChart from "./AccountReportChart";
+import AccountReportRevenueChart from "./AccountReportRevenueChart";
 import AccountReportTable from "./AccountReportTable";
+import AccountReportTransactionChart from "./AccountReportTransactionChart";
 
 
 const Summary = ({ data, handleSummaryLogDownlaod }) => {
@@ -10,10 +11,15 @@ const Summary = ({ data, handleSummaryLogDownlaod }) => {
             >{`${data.name} at ${data.communityName} ${data.year}`}</p>
             <br />
             <br />
-            <p style={{ fontSize: "2vh" }}>Revenue & Transaction Summary</p>
+            <p style={{ fontSize: "2vh" }}>Revenue Summary</p>
             <br/>
             <div style={{width: "min(80vw, 900px)"}}>
-                <AccountReportChart data={data} />
+                <AccountReportRevenueChart data={data} />
+            </div>
+            <p style={{ fontSize: "2vh" }}>Transaction Summary</p>
+            <br/>
+            <div style={{width: "min(80vw, 900px)"}}>
+                <AccountReportTransactionChart data={data} />
             </div>
             <br />
             <br />
