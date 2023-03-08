@@ -11,7 +11,7 @@ const CidSelect = ({ value }) => {
         };
 
         getCids().catch(console.error);
-    }, [value]);
+    }, []);
 
     if (cids) {
         return (

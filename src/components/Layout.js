@@ -6,7 +6,6 @@ import LogoutButton from "./LogoutButton";
 
 const Layout = ({ children, communityName }) => {
     const { me, setMe } = useContext(MeContext);
-    console.log(me)
     return (
         <div
             style={{

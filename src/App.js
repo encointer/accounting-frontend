@@ -1,7 +1,7 @@
 import "./styles.scss";
 import "./Spinner.css";
 import { Routes, Route } from "react-router-dom";
-import { createContext, React, useState } from "react";
+import { createContext, React, useEffect, useState } from "react";
 import AccountReport from "./components/AccountReport";
 import AccountOverview from "./components/AccountOverview";
 import TurnoverReport from "./components/TurnoverReport";
@@ -13,20 +13,23 @@ import AddUser from "./components/AddUser";
 import ChangePassword from "./components/ChangePassword";
 import SelectedRangeOverview from "./components/SelectedRangeOverview";
 
-export const MeContext = createContext(null);
+export const MeContext = createContext({});
 
 function App() {
-    const [me, setMe] = useState(async () => {
-        const res = await apiGet("auth/me");
-        if ([401, 403].includes(res.status)) {
-            setMe(null);
-            return;
-        }
-        const me = await res.json();
-        console.log(me);
-        setMe(me);
-        return me;
-    });
+    const [me, setMe] = useState({});
+
+    useEffect(() => {
+        const fetchMe = async () => {
+            const res = await apiGet("auth/me");
+            if ([401, 403].includes(res.status)) {
+                setMe({});
+                return;
+            }
+            const me = await res.json();
+            setMe(me);
+        };
+        fetchMe().catch(console.error);
+    }, []);
 
     return (
         <MeContext.Provider value={{ me, setMe }}>

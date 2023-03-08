@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-    downloadDataUrl,
-    getRewardsReportCsv,
-} from "../util";
+import { downloadDataUrl, getRewardsReportCsv } from "../util";
 import Spinner from "./Spinner";
 import CidForm from "./CidForm";
 import InternalLayout from "./InternalLayout";

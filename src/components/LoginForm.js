@@ -19,7 +19,6 @@ function LoginForm({ setMe }) {
             return;
         }
         const me = await res.json();
-        console.log(me);
         setMe(me);
     };
 
