@@ -55,7 +55,7 @@ const SelectedRangeOverview = () => {
     };
 
     return (
-        <Layout title="Selected Range" communityName={data.communityName}>
+        <Layout communityName={data.communityName}>
             <StartEndForm handleSubmit={handleSubmitForm} />
             <br />
             <br />

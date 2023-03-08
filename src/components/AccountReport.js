@@ -76,7 +76,7 @@ const AccountReport = () => {
     };
 
     return (
-        <Layout title="Account Report" communityName={data.communityName}>
+        <Layout communityName={data.communityName}>
             <CidForm handleSubmit={handleSubmitAddressForm} />
             <br />
             <br />

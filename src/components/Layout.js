@@ -4,8 +4,9 @@ import { MeContext } from "../App";
 import LoginForm from "./LoginForm";
 import LogoutButton from "./LogoutButton";
 
-const Layout = ({ children, title, communityName }) => {
+const Layout = ({ children, communityName }) => {
     const { me, setMe } = useContext(MeContext);
+    console.log(me)
     return (
         <div
             style={{
@@ -40,7 +41,7 @@ const Layout = ({ children, title, communityName }) => {
                 {me?.address && (
                     <>
                         <div className="column"></div>
-                        <div className="column is-narrow m-1">{title}</div>
+                        <div className="column is-narrow m-1">Welcome, {me.name || me.address}</div>
                         <div className="column is-narrow has-background-light m-1">
                             <Link to="/account-report">Monthly Report</Link>
                         </div>
