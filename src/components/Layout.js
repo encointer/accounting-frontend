@@ -42,6 +42,12 @@ const Layout = ({ children, title, communityName }) => {
                         <div className="column"></div>
                         <div className="column is-narrow m-1">{title}</div>
                         <div className="column is-narrow has-background-light m-1">
+                            <Link to="/account-report">Monthly Report</Link>
+                        </div>
+                        <div className="column is-narrow has-background-light m-1">
+                            <Link to="/selected-range">Selected Range</Link>
+                        </div>
+                        <div className="column is-narrow has-background-light m-1">
                             <Link to="/change-password">Change Password</Link>
                         </div>
                         <LogoutButton me={me} />

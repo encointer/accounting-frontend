@@ -24,8 +24,6 @@ const SummaryLogRow = ({
             <td>{numIssues}</td>
             <td>{numDistinctClients}</td>
             <td>{round(avgTxnValue)}</td>
-
-            {/* <td><button className="button is-link">Download Transaction Log</button></td> */}
         </tr>
     );
 };

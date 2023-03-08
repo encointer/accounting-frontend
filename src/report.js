@@ -1,6 +1,6 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { summaryLogFields } from "./consts";
+import { dailyDigestFields, summaryLogFields } from "./consts";
 
 import { round } from "./util";
 import { poppins } from "./fonts";
@@ -67,19 +67,7 @@ export async function getReport(data) {
         doc.text(10, 25, `${monthItem.month} ${data.year} Daily Digest`);
 
         autoTable(doc, {
-            head: [
-                [
-                    "Day",
-                    "# Incoming",
-                    "Sum Incoming",
-                    "# Outgoing",
-                    "Sum Outgoing",
-                    "# Issuance",
-                    "Sum Issuance",
-                    "# Distinct Clients",
-                    "Avg Transaction Value",
-                ],
-            ],
+            head: dailyDigestFields,
             body: Object.entries(monthItem.dailyDigest).map(
                 ([dayString, data]) => [
                     dayString,

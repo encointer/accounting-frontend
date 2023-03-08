@@ -11,6 +11,7 @@ import { apiGet } from "./api";
 import LoginAs from "./components/LoginAs";
 import AddUser from "./components/AddUser";
 import ChangePassword from "./components/ChangePassword";
+import SelectedRangeOverview from "./components/SelectedRangeOverview";
 
 export const MeContext = createContext(null);
 
@@ -45,6 +46,10 @@ function App() {
                         element={<AccountOverview />}
                     />
                     <Route
+                        path="/selected-range"
+                        element={<SelectedRangeOverview />}
+                    />
+                    <Route
                         path="/turnover-report"
                         element={<TurnoverReport />}
                     />
@@ -55,7 +60,10 @@ function App() {
                     <Route path="/add-user" element={<AddUser />} />
                     <Route path="/account-report" element={<AccountReport />} />
                     <Route path="/login-as" element={<LoginAs />} />
-                    <Route path="/change-password" element={<ChangePassword />} />
+                    <Route
+                        path="/change-password"
+                        element={<ChangePassword />}
+                    />
                 </Routes>
             </div>
         </MeContext.Provider>
