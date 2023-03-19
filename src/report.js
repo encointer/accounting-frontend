@@ -67,7 +67,7 @@ export async function getReport(data) {
         doc.text(10, 25, `${monthItem.month} ${data.year} Daily Digest`);
 
         autoTable(doc, {
-            head: dailyDigestFields,
+            head: [dailyDigestFields],
             body: Object.entries(monthItem.dailyDigest).map(
                 ([dayString, data]) => [
                     dayString,
