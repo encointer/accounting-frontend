@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import Layout from "./Layout";
+import PublicInternalLayout from "./PublicInternalLayout";
 import Spinner from "./Spinner";
 import { apiGet } from "../api";
 import { MeContext } from "../App";
@@ -55,7 +55,7 @@ const SelectedRangeOverview = () => {
     };
 
     return (
-        <Layout communityName={data.communityName}>
+        <PublicInternalLayout communityName={data.communityName}>
             <StartEndForm handleSubmit={handleSubmitForm} />
             <br />
             <br />
@@ -79,7 +79,7 @@ const SelectedRangeOverview = () => {
                     <DailyDigestTable dailyDigest={data.data.dailyDigest} />
                 </div>
             )}
-        </Layout>
+        </PublicInternalLayout>
     );
 };
 

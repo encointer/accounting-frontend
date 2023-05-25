@@ -12,6 +12,7 @@ import LoginAs from "./components/LoginAs";
 import AddUser from "./components/AddUser";
 import ChangePassword from "./components/ChangePassword";
 import SelectedRangeOverview from "./components/SelectedRangeOverview";
+import Home from "./components/Home";
 
 export const MeContext = createContext({});
 
@@ -35,7 +36,7 @@ function App() {
         <MeContext.Provider value={{ me, setMe }}>
             <div className="App">
                 <Routes>
-                    <Route path="/" element={<AccountReport />} />
+                    <Route path="/" element={<Home />} />
                     <Route
                         path="/internal"
                         element={

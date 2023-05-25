@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import Layout from "./Layout";
+import PublicInternalLayout from "./PublicInternalLayout";
 import { downloadDataUrl, getMonthName, getTxnLogCsv } from "../util";
 import { getReport } from "../report";
 import JSZip from "jszip";
@@ -76,7 +76,7 @@ const AccountReport = () => {
     };
 
     return (
-        <Layout communityName={data.communityName}>
+        <PublicInternalLayout communityName={data.communityName}>
             <CidForm handleSubmit={handleSubmitAddressForm} />
             <br />
             <br />
@@ -89,7 +89,7 @@ const AccountReport = () => {
                     />
                 </div>
             )}
-        </Layout>
+        </PublicInternalLayout>
     );
 };
 

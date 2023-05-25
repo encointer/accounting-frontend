@@ -4,7 +4,7 @@ import { MeContext } from "../App";
 import LoginForm from "./LoginForm";
 import LogoutButton from "./LogoutButton";
 
-const Layout = ({ children, communityName }) => {
+const PublicInternalLayout = ({ children, communityName }) => {
     const { me, setMe } = useContext(MeContext);
     return (
         <div
@@ -68,4 +68,4 @@ const Layout = ({ children, communityName }) => {
     );
 };
 
-export default Layout;
+export default PublicInternalLayout;

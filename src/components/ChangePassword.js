@@ -1,6 +1,6 @@
 import { apiPost } from "../api";
 import { useState } from "react";
-import Layout from "./Layout";
+import PublicInternalLayout from "./PublicInternalLayout";
 
 const ChangePassword = () => {
     const [message, setMessage] = useState("");
@@ -27,7 +27,7 @@ const ChangePassword = () => {
     };
 
     return (
-        <Layout>
+        <PublicInternalLayout>
             <form>
                 <h1>Change Password</h1>
                 <br />
@@ -76,7 +76,7 @@ const ChangePassword = () => {
                 </div>
             </form>
             <p>{message}</p>
-        </Layout>
+        </PublicInternalLayout>
     );
 };
 
