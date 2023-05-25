@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { downloadDataUrl, getMonthName, getTurnoverReportCsv } from "../util";
+import {
+    downloadDataUrl,
+    getMonthName,
+    getTurnoverReportCsv,
+    round,
+} from "../util";
 import Spinner from "./Spinner";
 import CidForm from "./CidForm";
 import TurnoverTable from "./TurnoverTable";
@@ -23,46 +28,46 @@ const TurnoverReport = () => {
                 if (res.status === 403) {
                     return;
                 }
-
                 if (res.ok) {
-                    const reportData = await res.json();
+                    const data = await res.json();
                     setShowSpinner(false);
-                    setCommunityName(reportData.communityName);
-                    setYear(reportData.year);
+                    setCommunityName(data.communityName);
+                    setYear(data.year);
 
-                    const displayData = {};
-
-                    const header = reportData.data
-                        .map((d) => d.name)
-                        .concat("Total");
-
-                    for (const businessData of reportData.data) {
-                        for (const monthData of businessData.data) {
-                            displayData[monthData.month] =
-                                displayData[monthData.month] || {};
-                            displayData[monthData.month][businessData.name] =
-                                monthData.sumIncoming;
-                        }
-                    }
-                    Object.values(displayData).forEach(
-                        (monthItem) =>
-                            (monthItem.Total = Object.values(monthItem).reduce(
-                                (acc, cur) => acc + cur,
-                                0
-                            ))
+                    const reportData = data.data;
+                    reportData.forEach((item) =>
+                        item.data.sort((a, b) => a.month - b.month)
                     );
 
-                    const rows = [];
-                    for (const [monthIndex, data] of Object.entries(
-                        displayData
-                    )) {
-                        const row = [];
-                        row.push(getMonthName(monthIndex));
-                        for (const columnName of header) {
-                            row.push(data[columnName]);
-                        }
-                        rows.push(row);
-                    }
+                    const months = reportData[0].data.map((item) => item.month);
+                    const header = months.map((month) => getMonthName(month));
+
+                    const rows = reportData.map((row) =>
+                        [row.name].concat(
+                            months.map((month) =>
+                                round(
+                                    row.data.find(
+                                        (item) => item.month === month
+                                    ).sumIncoming
+                                )
+                            )
+                        )
+                    );
+                    rows.push(
+                        ["Total"].concat(
+                            months.map((month) =>
+                                round(
+                                    reportData.reduce(
+                                        (acc, cur) =>
+                                            cur.data.find(
+                                                (item) => item.month === month
+                                            ).sumIncoming + acc,
+                                        0
+                                    )
+                                )
+                            )
+                        )
+                    );
 
                     setRows(rows);
                     setHeader(header);

@@ -1,5 +1,3 @@
-import { round } from "../util";
-
 const TurnoverTable = ({
     header,
     rows,
@@ -28,7 +26,7 @@ const TurnoverTable = ({
                         <tr key={i}>
                             <th>{row[0]}</th>
                             {row.slice(1).map((data, idx) => (
-                                <td key={idx}>{round(data || 0)}</td>
+                                <td key={idx}>{data}</td>
                             ))}
                         </tr>
                     ))}
