@@ -10,6 +10,7 @@ import CidForm from "./CidForm";
 import TurnoverTable from "./TurnoverTable";
 import InternalLayout from "./InternalLayout";
 import { apiGet } from "../api";
+import CidYearForm from "./CidYearForm";
 
 const TurnoverReport = () => {
     const [header, setHeader] = useState([]);
@@ -21,9 +22,9 @@ const TurnoverReport = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            if (cid) {
+            if (cid && year) {
                 const res = await apiGet(
-                    `accounting/all-accounts-data?&cid=${cid}`
+                    `accounting/all-accounts-data?&cid=${cid}&year=${year}`
                 );
                 if (res.status === 403) {
                     return;
@@ -32,7 +33,6 @@ const TurnoverReport = () => {
                     const data = await res.json();
                     setShowSpinner(false);
                     setCommunityName(data.communityName);
-                    setYear(data.year);
 
                     const reportData = data.data;
                     reportData.forEach((item) =>
@@ -92,11 +92,12 @@ const TurnoverReport = () => {
         setHeader([]);
         setShowSpinner(true);
         setCid(e.target.form.cid.value);
+        setYear(e.target.form.year.value);
     };
 
     return (
         <InternalLayout>
-            <CidForm handleSubmit={handleSubmitForm} />
+            <CidYearForm handleSubmit={handleSubmitForm} />
             <br />
             <br />
             {showSpinner && <Spinner />}
