@@ -7,11 +7,6 @@ const TurnoverTable = ({
 }) => {
     return (
         <div>
-            <p
-                style={{ fontSize: "3.5vh" }}
-            >{`Turnover Report for ${communityName} ${year}`}</p>
-            <br />
-            <br />
             <table className="table">
                 <thead>
                     <tr>

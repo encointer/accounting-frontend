@@ -11,10 +11,12 @@ import TurnoverTable from "./TurnoverTable";
 import InternalLayout from "./InternalLayout";
 import { apiGet } from "../api";
 import CidYearForm from "./CidYearForm";
+import TurnoverChart from "./TurnoverChart";
 
 const TurnoverReport = () => {
     const [header, setHeader] = useState([]);
     const [rows, setRows] = useState([]);
+    const [volumes, setVolumes] = useState([]);
     const [communityName, setCommunityName] = useState("");
     const [year, setYear] = useState("");
     const [cid, setCid] = useState("");
@@ -23,7 +25,7 @@ const TurnoverReport = () => {
     useEffect(() => {
         const fetchData = async () => {
             if (cid && year) {
-                const res = await apiGet(
+                let res = await apiGet(
                     `accounting/all-accounts-data?&cid=${cid}&year=${year}`
                 );
                 if (res.status === 403) {
@@ -31,7 +33,6 @@ const TurnoverReport = () => {
                 }
                 if (res.ok) {
                     const data = await res.json();
-                    setShowSpinner(false);
                     setCommunityName(data.communityName);
 
                     const reportData = data.data;
@@ -71,11 +72,25 @@ const TurnoverReport = () => {
 
                     setRows(rows);
                     setHeader(header);
+
+
+                    let volumesRes = await apiGet(
+                        `accounting/volume-report?&cid=${cid}&year=${year}`
+                    );
+                    if (volumesRes.status === 403) {
+                        return;
+                    }
+                    if (volumesRes.ok) {
+                        const data = await volumesRes.json();
+                        setShowSpinner(false);
+                        const vols = months.map((month) => data.data[month]);
+                        setVolumes(vols);
+                    }
                 }
             }
         };
         fetchData().catch(console.error);
-    }, [cid]);
+    }, [cid, year]);
 
     const handleDownloadReport = async () => {
         const csv = getTurnoverReportCsv(header, rows);
@@ -89,7 +104,7 @@ const TurnoverReport = () => {
 
     const handleSubmitForm = (e) => {
         e.preventDefault();
-        setHeader([]);
+        setVolumes([]);
         setShowSpinner(true);
         setCid(e.target.form.cid.value);
         setYear(e.target.form.year.value);
@@ -98,17 +113,31 @@ const TurnoverReport = () => {
     return (
         <InternalLayout>
             <CidYearForm handleSubmit={handleSubmitForm} />
-            <br />
-            <br />
             {showSpinner && <Spinner />}
-            {Object.keys(header).length !== 0 && (
-                <TurnoverTable
-                    communityName={communityName}
-                    year={year}
-                    rows={rows}
-                    header={header}
-                    handleDownloadReport={handleDownloadReport}
-                />
+            {volumes.length !== 0 && (
+                <div>
+                    <br />
+                    <br />
+                    <p
+                        style={{ fontSize: "3.5vh" }}
+                    >{`Turnover Report for ${communityName} ${year}`}</p>
+                    <br />
+                    <br />
+                    <TurnoverChart
+                        rows={rows}
+                        header={header}
+                        volumes={volumes}
+                    />
+                    <br />
+                    <br />
+                    <TurnoverTable
+                        communityName={communityName}
+                        year={year}
+                        rows={rows}
+                        header={header}
+                        handleDownloadReport={handleDownloadReport}
+                    />
+                </div>
             )}
         </InternalLayout>
     );
