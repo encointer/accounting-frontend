@@ -13,6 +13,7 @@ import AddUser from "./components/AddUser";
 import ChangePassword from "./components/ChangePassword";
 import SelectedRangeOverview from "./components/SelectedRangeOverview";
 import Home from "./components/Home";
+import MoneyVelocityReport from "./components/MoneyVelocityReport";
 
 export const MeContext = createContext({});
 
@@ -56,6 +57,10 @@ function App() {
                     <Route
                         path="/turnover-report"
                         element={<TurnoverReport />}
+                    />
+                    <Route
+                        path="/money-velocity-report"
+                        element={<MoneyVelocityReport />}
                     />
                     <Route
                         path="/rewards-report"

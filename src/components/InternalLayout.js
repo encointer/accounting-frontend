@@ -36,6 +36,9 @@ const InternalLayout = ({ children }) => {
                             <Link to="/turnover-report">Turnover Report</Link>
                         </div>
                         <div className="column is-narrow has-background-light m-1">
+                            <Link to="/money-velocity-report">Money Velocity Report Report</Link>
+                        </div>
+                        <div className="column is-narrow has-background-light m-1">
                             <Link to="/rewards-report">Rewards Report</Link>
                         </div>
                         <div className="column is-narrow has-background-light m-1">

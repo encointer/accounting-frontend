@@ -55,6 +55,13 @@ export function getAccountOverviewCsv(data) {
     return csvString;
 }
 
+export function getMoneyVelocityReportCsv(data) {
+    const csvString = [["Month", "Money Velocity"], ...Object.entries(data)]
+        .map((e) => e.join(","))
+        .join("\n");
+    return csvString;
+}
+
 export function getRewardsReportCsv(data) {
     const csvString = [
         ["Cindex", "# Particiants", "Total Rewards"],
