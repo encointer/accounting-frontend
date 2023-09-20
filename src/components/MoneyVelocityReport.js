@@ -11,7 +11,7 @@ import CidYearForm from "./CidYearForm";
 import MoneyVelocityChart from "./MoneyVelocityChart";
 
 const MoneyVelocityReport = () => {
-    const [data, setData] = useState([]);
+    const [data, setData] = useState({});
     const [communityName, setCommunityName] = useState("");
     const [year, setYear] = useState("");
     const [cid, setCid] = useState("");
@@ -43,7 +43,7 @@ const MoneyVelocityReport = () => {
             }
         };
         fetchData().catch(console.error);
-    }, [cid]);
+    }, [cid, year]);
 
     const handleDownloadReport = async () => {
         const csv = getMoneyVelocityReportCsv(data);
