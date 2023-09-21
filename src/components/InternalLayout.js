@@ -41,7 +41,7 @@ const InternalLayout = ({ children }) => {
                 {me.isAdmin && (
                     <>
                         <div
-                        style={{marginRight: "2vw"}}
+                            style={{ marginRight: "2vw" }}
                             className={`dropdown ${
                                 isActive ? "is-active" : ""
                             }`}
@@ -93,6 +93,11 @@ const InternalLayout = ({ children }) => {
                                     <div className="dropdown-item">
                                         <Link to="/frequency-of-attendance">
                                             Frequency of Attendance
+                                        </Link>
+                                    </div>
+                                    <div className="dropdown-item">
+                                        <Link to="/transaction-activity">
+                                            Transaction Activity
                                         </Link>
                                     </div>
                                     <div className="dropdown-item">

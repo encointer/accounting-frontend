@@ -76,12 +76,28 @@ export function getRewardsReportCsv(data) {
     return csvString;
 }
 
+export function getTransactionActivityReportCsv(data) {
+    const csvString = [
+        ["Month", "# Personal", "# Gov", "# Acceptance Points", "# Voucher"],
+        ...data.map((e) => [
+            e.month,
+            e.personalTransactionCount,
+            e.govTransactionCount,
+            e.acceptancePointTransactionCount,
+            e.voucherTransactionCount,
+        ]),
+    ]
+        .map((e) => e.join(","))
+        .join("\n");
+    return csvString;
+}
+
 export function getReputablesByCindexReportCsv(data) {
     const csvString = [
         ["Cindex", "# Reputables"],
         ...Object.entries(data).map(([cindex, numReputables]) => [
             cindex,
-            numReputables
+            numReputables,
         ]),
     ]
         .map((e) => e.join(","))
@@ -94,7 +110,7 @@ export function getFrequencyOfAttendanceReportCsv(data) {
         ["Frequency of attendance", "Percentage of reputables"],
         ...Object.entries(data).map(([freqency, percentage]) => [
             freqency,
-            percentage
+            percentage,
         ]),
     ]
         .map((e) => e.join(","))

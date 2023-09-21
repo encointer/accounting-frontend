@@ -16,6 +16,7 @@ import Home from "./components/Home";
 import MoneyVelocityReport from "./components/MoneyVelocityReport";
 import ReputationsByCindexReport from "./components/ReputablesByCindexReport";
 import FrequencyOfAttendanceReport from "./components/FrequencyOfAttendanceReport";
+import TransactionActivityReport from "./components/TransactionActivityReport";
 
 export const MeContext = createContext({});
 
@@ -75,6 +76,10 @@ function App() {
                     <Route
                         path="/rewards-report"
                         element={<RewardsOverview />}
+                    />
+                    <Route
+                        path="/transaction-activity"
+                        element={<TransactionActivityReport />}
                     />
                     <Route path="/add-user" element={<AddUser />} />
                     <Route path="/account-report" element={<AccountReport />} />
