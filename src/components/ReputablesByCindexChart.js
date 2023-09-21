@@ -57,7 +57,7 @@ const ReputablesByCindexChart = ({ data }) => {
         else if (k === maxCindex - numCycles) trendlineData[k] = f(0, lr.slope, lr.intercept)
     else {trendlineData[k] = null}
     })
-    console.log(trendlineData)
+    const newReputablesTrend = (trendlineData[maxCindex] - trendlineData[maxCindex - numCycles]) / numCycles;
     
     return (
         <div>
@@ -89,8 +89,8 @@ const ReputablesByCindexChart = ({ data }) => {
                     options={{
                         plugins: {
                             title: {
-                                text: "Reputables by Cindex",
-                                display: false,
+                                text: `Trend: ${Math.round(newReputablesTrend * 100) / 100} new reputables per cycle`,
+                                display: true,
                             },
                             legend: {
                                 labels: {
