@@ -42,6 +42,9 @@ const InternalLayout = ({ children }) => {
                             <Link to="/rewards-report">Rewards Report</Link>
                         </div>
                         <div className="column is-narrow has-background-light m-1">
+                            <Link to="/reputables-by-cindex">Reputables by Cindex</Link>
+                        </div>
+                        <div className="column is-narrow has-background-light m-1">
                             <Link to="/add-user">Add User</Link>
                         </div>
                         <div className="column is-narrow has-background-light m-1">

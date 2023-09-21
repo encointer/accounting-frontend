@@ -14,6 +14,7 @@ import ChangePassword from "./components/ChangePassword";
 import SelectedRangeOverview from "./components/SelectedRangeOverview";
 import Home from "./components/Home";
 import MoneyVelocityReport from "./components/MoneyVelocityReport";
+import ReputationsByCindexReport from "./components/ReputablesByCindexReport";
 
 export const MeContext = createContext({});
 
@@ -61,6 +62,10 @@ function App() {
                     <Route
                         path="/money-velocity-report"
                         element={<MoneyVelocityReport />}
+                    />
+                    <Route
+                        path="/reputables-by-cindex"
+                        element={<ReputationsByCindexReport />}
                     />
                     <Route
                         path="/rewards-report"
