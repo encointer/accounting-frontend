@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { MeContext } from "../App";
 import LoginForm from "./LoginForm";
@@ -6,6 +6,17 @@ import LogoutButton from "./LogoutButton";
 
 const InternalLayout = ({ children }) => {
     const { me, setMe } = useContext(MeContext);
+    const [isActive, setisActive] = useState(false);
+    const buttonRef = useRef();
+
+    useEffect(() => {
+        window.onclick = (event) => {
+            if (event.target !== buttonRef.current) {
+                setisActive(false);
+            }
+        };
+    }, []);
+
     return (
         <div
             style={{
@@ -26,29 +37,72 @@ const InternalLayout = ({ children }) => {
                         />
                     </Link>
                 </div>
+                <div className="column is-6"></div>
                 {me.isAdmin && (
                     <>
-                        <div className="column"></div>
-                        <div className="column is-narrow has-background-light m-1">
-                            <Link to="/account-overview">Account Overview</Link>
-                        </div>
-                        <div className="column is-narrow has-background-light m-1">
-                            <Link to="/turnover-report">Turnover Report</Link>
-                        </div>
-                        <div className="column is-narrow has-background-light m-1">
-                            <Link to="/money-velocity-report">Money Velocity Report</Link>
-                        </div>
-                        <div className="column is-narrow has-background-light m-1">
-                            <Link to="/rewards-report">Rewards Report</Link>
-                        </div>
-                        <div className="column is-narrow has-background-light m-1">
-                            <Link to="/reputables-by-cindex">Reputables by Cindex</Link>
-                        </div>
-                        <div className="column is-narrow has-background-light m-1">
-                            <Link to="/add-user">Add User</Link>
-                        </div>
-                        <div className="column is-narrow has-background-light m-1">
-                            <Link to="/login-as">Login as</Link>
+                        <div
+                        style={{marginRight: "2vw"}}
+                            className={`dropdown ${
+                                isActive ? "is-active" : ""
+                            }`}
+                        >
+                            <div className="dropdown-trigger">
+                                <button
+                                    className="button navbar-link"
+                                    aria-haspopup="true"
+                                    aria-controls="dropdown-menu"
+                                    onClick={() => {
+                                        setisActive(!isActive);
+                                    }}
+                                    ref={buttonRef}
+                                >
+                                    Menu
+                                </button>
+                            </div>
+                            <div
+                                className="dropdown-menu"
+                                id="dropdown-menu"
+                                role="menu"
+                            >
+                                <div className="dropdown-content">
+                                    <div className="dropdown-item">
+                                        <Link to="/account-overview">
+                                            Account Overview
+                                        </Link>
+                                    </div>
+                                    <div className="dropdown-item">
+                                        <Link to="/turnover-report">
+                                            Turnover Report
+                                        </Link>
+                                    </div>
+                                    <div className="dropdown-item">
+                                        <Link to="/money-velocity-report">
+                                            Money Velocity Report
+                                        </Link>
+                                    </div>
+                                    <div className="dropdown-item">
+                                        <Link to="/rewards-report">
+                                            Rewards Report
+                                        </Link>
+                                    </div>
+                                    <div className="dropdown-item">
+                                        <Link to="/reputables-by-cindex">
+                                            Reputables by Cindex
+                                        </Link>
+                                    </div>
+                                    <div className="dropdown-item">
+                                        <Link to="/frequency-of-attendance">
+                                            Frequency of Attendance
+                                        </Link>
+                                    </div>
+                                    <div className="dropdown-item">
+                                        <Link to="/add-user">Add User</Link>
+                                    </div>
+                                    <div className="dropdown-item">
+                                        <Link to="/login-as">Login as</Link>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <LogoutButton me={me} />
                     </>

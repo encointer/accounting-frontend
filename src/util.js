@@ -89,6 +89,19 @@ export function getReputablesByCindexReportCsv(data) {
     return csvString;
 }
 
+export function getFrequencyOfAttendanceReportCsv(data) {
+    const csvString = [
+        ["Frequency of attendance", "Percentage of reputables"],
+        ...Object.entries(data).map(([freqency, percentage]) => [
+            freqency,
+            percentage
+        ]),
+    ]
+        .map((e) => e.join(","))
+        .join("\n");
+    return csvString;
+}
+
 export function getTurnoverReportCsv(header, rows) {
     const csvString = [["Month"].concat(header), ...rows]
         .map((e) => e.join(","))
