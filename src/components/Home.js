@@ -14,6 +14,11 @@ const Home = () => {
             <br/>
             <br/>
             <RewardsChart cid="dpcmj33LUs9"/>
+            <br/>
+            <big>Nyota Rewards Overview</big>
+            <br/>
+            <br/>
+            <RewardsChart cid="kygch5kVGq7"/>
         </PublicLayout>
     );
 };
