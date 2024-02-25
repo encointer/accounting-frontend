@@ -2,7 +2,7 @@ import { Chart as ReactChart } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 import { SankeyController, Flow } from "chartjs-chart-sankey";
 
-const SankeyChart = ({ data }) => {
+const SankeyChart = ({ data, accountName }) => {
     Chart.register(...registerables);
     Chart.register(SankeyController, Flow);
 
@@ -39,7 +39,7 @@ const SankeyChart = ({ data }) => {
                     cii: "CII",
                     b2b: "B2B",
                     retail: "Retail",
-                    biz: "Biz",
+                    biz: accountName,
                     suppliers: "Suppliers",
                     lea: "Lea Buy Back",
                     unknown: "Unknown",

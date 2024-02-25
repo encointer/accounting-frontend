@@ -55,7 +55,7 @@ const SankeyReport = () => {
                     <p
                         style={{ fontSize: "3.5vh" }}
                     >{`Sankey Chart for ${accountName} at ${communityName}`}</p>
-                    <SankeyChart data={data} />
+                    <SankeyChart data={data} accountName={accountName} />
                 </div>
             )}
         </InternalLayout>
