@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^13.5.0",
     "bulma": "^0.9.4",
     "chart.js": "^4.2.0",
+    "chartjs-chart-sankey": "^0.12.0",
     "cors": "^2.8.5",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.5.28",

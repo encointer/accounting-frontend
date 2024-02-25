@@ -101,6 +101,11 @@ const InternalLayout = ({ children }) => {
                                         </Link>
                                     </div>
                                     <div className="dropdown-item">
+                                        <Link to="/sankey-report">
+                                            Sankey Report
+                                        </Link>
+                                    </div>
+                                    <div className="dropdown-item">
                                         <Link to="/add-user">Add User</Link>
                                     </div>
                                     <div className="dropdown-item">

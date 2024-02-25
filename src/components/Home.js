@@ -1,9 +1,11 @@
 import PublicLayout from "./PublicLayout";
 import RewardsChart from "./RewardsChart";
+import SankeyChart from "./SankeyChart";
 
 const Home = () => {
     return (
         <PublicLayout>
+            <SankeyChart/>
             <br/>
             <big>Leu Zürich Rewards Overview</big>
             <br/>
