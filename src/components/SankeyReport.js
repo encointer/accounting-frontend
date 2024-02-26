@@ -39,9 +39,16 @@ const SankeyReport = () => {
         e.preventDefault();
         setData({});
         setShowSpinner(true);
+        const start = new Date(e.target.form.startDate.value).getTime()
+        const end = new Date(e.target.form.endDate.value).getTime();
+        if(start >= end){
+            alert('Please set start date before and date')
+            setShowSpinner(false);
+            return
+        }
         setAccount(e.target.form.account.value);
-        setStart(new Date(e.target.form.startDate.value).getTime());
-        setEnd(new Date(e.target.form.endDate.value).getTime());
+        setStart(start);
+        setEnd(end);
     };
 
     return (
