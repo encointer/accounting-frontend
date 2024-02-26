@@ -42,7 +42,7 @@ const SankeyReport = () => {
         const start = new Date(e.target.form.startDate.value).getTime()
         const end = new Date(e.target.form.endDate.value).getTime();
         if(start >= end){
-            alert('Please set start date before and date')
+            alert('Please set start date before end date')
             setShowSpinner(false);
             return
         }

@@ -2,6 +2,8 @@ import { Chart as ReactChart } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 import { SankeyController, Flow } from "chartjs-chart-sankey";
 
+const round = x => Math.round(x * 100) / 100
+
 const SankeyChart = ({ data, accountName }) => {
     Chart.register(...registerables);
     Chart.register(SankeyController, Flow);
@@ -22,6 +24,15 @@ const SankeyChart = ({ data, accountName }) => {
         datasets: [
             {
                 label: "Sankey",
+                tooltipTemplate: "<%= value %>",
+
+                showTooltips: true,
+              
+                onAnimationComplete: function() {
+                  this.showTooltip(this.datasets[0].points, true);
+                },
+                tooltipEvents: [],
+
                 data: [
                     { from: "cii", to: "biz", flow: data.ciiToBiz },
                     { from: "b2b", to: "biz", flow: data.b2bToBiz },
@@ -36,14 +47,14 @@ const SankeyChart = ({ data, accountName }) => {
                 colorMode: "gradient", // or 'from' or 'to'
                 /* optional labels */
                 labels: {
-                    cii: "CII",
-                    b2b: "B2B",
-                    retail: "Retail",
+                    cii: `CII (${round(data.ciiToBiz)})`,
+                    b2b: `CII (${round(data.b2bToBiz)})`,
+                    retail: `Retail (${round(data.retailToBiz)})` ,
                     biz: accountName,
-                    suppliers: "Suppliers",
-                    lea: "Lea Buy Back",
-                    unknown: "Unknown",
-                    demurrage: "Demurrage",
+                    suppliers: `Suppliers (${round(data.bizToSuppliers)})`,
+                    lea: `Lea Buy Back (${round(data.bizToLea)})`,
+                    unknown: `Unknown (${round(data.bizToUnknown)})`,
+                    demurrage: `Demurrage (${round(data.bizToDemurrage)})`,
                 },
             },
         ],
