@@ -7,6 +7,7 @@ const round = x => Math.round(x * 100) / 100
 const SankeyChart = ({ data, accountName }) => {
     Chart.register(...registerables);
     Chart.register(SankeyController, Flow);
+    Chart.defaults.font.size = 20;
 
     const colors = {
         cii: "lightblue",
@@ -24,14 +25,6 @@ const SankeyChart = ({ data, accountName }) => {
         datasets: [
             {
                 label: "Sankey",
-                tooltipTemplate: "<%= value %>",
-
-                showTooltips: true,
-              
-                onAnimationComplete: function() {
-                  this.showTooltip(this.datasets[0].points, true);
-                },
-                tooltipEvents: [],
 
                 data: [
                     { from: "cii", to: "biz", flow: data.ciiToBiz },
