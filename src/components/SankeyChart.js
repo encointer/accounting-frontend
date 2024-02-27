@@ -41,7 +41,7 @@ const SankeyChart = ({ data, accountName }) => {
                 /* optional labels */
                 labels: {
                     cii: `CII (${round(data.ciiToBiz)})`,
-                    b2b: `CII (${round(data.b2bToBiz)})`,
+                    b2b: `B2B (${round(data.b2bToBiz)})`,
                     retail: `Retail (${round(data.retailToBiz)})` ,
                     biz: accountName,
                     suppliers: `Suppliers (${round(data.bizToSuppliers)})`,

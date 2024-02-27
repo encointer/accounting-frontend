@@ -20,6 +20,7 @@ const AccountSelect = () => {
                 <div className="control">
                     <div className="select">
                         <select name="account">
+                        <option value="all">All</option>
                             {accounts.map((account, idx) => (
                                 <option value={account.address} key={idx}>
                                     {account.name}
