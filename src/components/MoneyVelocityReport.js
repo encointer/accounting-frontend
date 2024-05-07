@@ -11,17 +11,20 @@ import CidYearForm from "./CidYearForm";
 import MoneyVelocityChart from "./MoneyVelocityChart";
 
 const MoneyVelocityReport = () => {
+    const useTotalVolumeForCommunities = ['kygch5kVGq7']
+
     const [data, setData] = useState({});
     const [communityName, setCommunityName] = useState("");
     const [year, setYear] = useState("");
     const [cid, setCid] = useState("");
     const [showSpinner, setShowSpinner] = useState(false);
+    const [useTotalVolume, setUseTotalVolume] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             if (cid && year) {
                 const res = await apiGet(
-                    `accounting/money-velocity-report?&cid=${cid}&year=${year}`
+                    `accounting/money-velocity-report?&cid=${cid}&year=${year}&useTotalVolume=${useTotalVolume}`
                 );
                 if (res.status === 403) {
                     return;
@@ -59,7 +62,9 @@ const MoneyVelocityReport = () => {
         e.preventDefault();
         setData({});
         setShowSpinner(true);
-        setCid(e.target.form.cid.value);
+        const cid = e.target.form.cid.value
+        setUseTotalVolume(useTotalVolumeForCommunities.includes(cid));
+        setCid(cid);
         setYear(e.target.form.year.value);
     };
 
@@ -73,7 +78,7 @@ const MoneyVelocityReport = () => {
                 <div>
                     <p
                         style={{ fontSize: "3.5vh" }}
-                    >{`Money Velocity at ${communityName} ${year}`}</p>
+                    >{`Money Velocity at ${communityName} ${year}${useTotalVolume ?' (using total volume)' : ''}`}</p>
                     <MoneyVelocityChart
                         communityName={communityName}
                         year={year}

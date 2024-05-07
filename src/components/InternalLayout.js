@@ -38,7 +38,7 @@ const InternalLayout = ({ children }) => {
                     </Link>
                 </div>
                 <div className="column is-6"></div>
-                {me.isAdmin && (
+                {(me?.isAdmin || me?.isReadonlyAdmin) && (
                     <>
                         <div
                             style={{ marginRight: "2vw" }}
@@ -105,12 +105,20 @@ const InternalLayout = ({ children }) => {
                                             Sankey Report
                                         </Link>
                                     </div>
-                                    <div className="dropdown-item">
-                                        <Link to="/add-user">Add User</Link>
-                                    </div>
-                                    <div className="dropdown-item">
-                                        <Link to="/login-as">Login as</Link>
-                                    </div>
+                                    {me.isAdmin && (
+                                        <>
+                                            <div className="dropdown-item">
+                                                <Link to="/add-user">
+                                                    Add User
+                                                </Link>
+                                            </div>
+                                            <div className="dropdown-item">
+                                                <Link to="/login-as">
+                                                    Login as
+                                                </Link>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -118,10 +126,12 @@ const InternalLayout = ({ children }) => {
                     </>
                 )}
             </div>{" "}
-            {me?.isAdmin && (
+            {(me?.isAdmin || me?.isReadonlyAdmin) && (
                 <div className="is-align-items-flex-start"> {children}</div>
             )}
-            {!me?.isAdmin && <LoginForm setMe={setMe} />}
+            {!(me?.isAdmin || me?.isReadonlyAdmin) && (
+                <LoginForm setMe={setMe} />
+            )}
             <footer>
                 <br />
                 <br />
