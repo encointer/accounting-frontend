@@ -1,6 +1,8 @@
 import { API_URL } from "../consts";
+import { useNavigate } from "react-router-dom";
 
 function LoginForm({ setMe }) {
+    const navigate = useNavigate();
     const authenticate = async (e) => {
         e.preventDefault();
         const res = await fetch(`${API_URL}/auth/authenticate`, {
@@ -20,6 +22,7 @@ function LoginForm({ setMe }) {
         }
         const me = await res.json();
         setMe(me);
+        if(me.isAdmin || me.isReadonlyAdmin) navigate('/internal');
     };
 
     return (
