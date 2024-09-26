@@ -26,7 +26,7 @@ const TurnoverReport = () => {
         const fetchData = async () => {
             if (cid && year) {
                 let res = await apiGet(
-                    `accounting/all-accounts-data?&cid=${cid}&year=${year}`
+                    `accounting/all-accounts-data?&cid=${cid}&year=${year}&includeCurrentMonth=true`
                 );
                 if (res.status === 403) {
                     return;
