@@ -56,7 +56,6 @@ const SankeyReport = () => {
 
     return (
         <InternalLayout>
-            <CidSelect />
             <AccountStartEndForm handleSubmit={handleSubmitForm} />
             <br />
             <br />
