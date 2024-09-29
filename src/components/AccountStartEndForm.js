@@ -25,6 +25,7 @@ const AccountStartEndForm = ({ handleSubmit }) => {
     return (
         <form>
             <div>
+                <CidSelect />
                 <div className="field">
                     <label>Start Date</label>
                     <div className="control">
