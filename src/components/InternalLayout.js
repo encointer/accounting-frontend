@@ -135,7 +135,7 @@ const InternalLayout = ({ children }) => {
             <footer>
                 <br />
                 <br />
-                <br />© 2023 Encointer Association
+                <br />© 2025 Encointer Association
             </footer>
         </div>
     );
