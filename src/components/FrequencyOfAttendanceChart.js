@@ -1,7 +1,7 @@
 import { Scatter } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 
-const FrequenyOfAttendanceChart = ({ data }) => {
+const FrequencyOfAttendanceChart = ({ data }) => {
     Chart.register(...registerables);
     return (
         <div>
@@ -24,7 +24,7 @@ const FrequenyOfAttendanceChart = ({ data }) => {
                     options={{
                         plugins: {
                             title: {
-                                text: "Cumulative freauency of attendance",
+                                text: "Cumulative frequency of attendance",
                                 display: true,
                             },
                             legend: {
@@ -78,4 +78,4 @@ const FrequenyOfAttendanceChart = ({ data }) => {
     );
 };
 
-export default FrequenyOfAttendanceChart;
+export default FrequencyOfAttendanceChart;

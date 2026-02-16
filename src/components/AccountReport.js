@@ -23,6 +23,8 @@ const AccountReport = () => {
                 );
 
                 if (res.status === 403) {
+                    setShowSpinner(false);
+                    alert("Access denied. Please log in again.");
                     return;
                 }
 

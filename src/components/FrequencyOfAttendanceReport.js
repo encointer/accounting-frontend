@@ -9,7 +9,7 @@ import InternalLayout from "./InternalLayout";
 import { apiGet } from "../api";
 import CidForm from "./CidForm";
 import ReputablesByCindexChart from "./ReputablesByCindexChart";
-import FrequenyOfAttendanceChart from "./FrequenyOfAttendanceChart";
+import FrequencyOfAttendanceChart from "./FrequencyOfAttendanceChart";
 
 const FrequencyOfAttendanceReport = () => {
     const [data, setData] = useState({});
@@ -24,6 +24,8 @@ const FrequencyOfAttendanceReport = () => {
                     `accounting/frequency-of-attendance?&cid=${cid}`
                 );
                 if (res.status === 403) {
+                    setShowSpinner(false);
+                    alert("Access denied. Please log in again.");
                     return;
                 }
                 if (res.ok) {
@@ -65,7 +67,7 @@ const FrequencyOfAttendanceReport = () => {
                     <p
                         style={{ fontSize: "3.5vh" }}
                     >{`Cumulative frequency of attendance at ${communityName}`}</p>
-                    <FrequenyOfAttendanceChart
+                    <FrequencyOfAttendanceChart
                         communityName={communityName}
                         data={data}
                     />
