@@ -19,6 +19,7 @@ import FrequencyOfAttendanceReport from "./components/FrequencyOfAttendanceRepor
 import TransactionActivityReport from "./components/TransactionActivityReport";
 import SankeyReport from "./components/SankeyReport";
 import FaucetDripsReport from "./components/FaucetDripsReport";
+import TransactionHistory from "./components/TransactionHistory";
 
 export const MeContext = createContext({});
 
@@ -87,6 +88,10 @@ function App() {
                     <Route
                         path="/faucet-drips"
                         element={<FaucetDripsReport />}
+                    />
+                    <Route
+                        path="/transaction-history"
+                        element={<TransactionHistory />}
                     />
                     <Route path="/add-user" element={<AddUser />} />
                     <Route path="/account-report" element={<AccountReport />} />
