@@ -15,5 +15,5 @@ module.exports = defineConfig({
       use: { browserName: "chromium" },
     },
   ],
-  reporter: [["html", { open: "never" }]],
+  reporter: process.env.CI ? "list" : [["html", { open: "never" }]],
 });
