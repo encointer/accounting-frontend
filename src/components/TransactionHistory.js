@@ -62,7 +62,12 @@ async function fetchAllTransactions(address, start, end) {
         );
         if (!res.ok) return [];
         const entries = await res.json();
-        return entries.map((e) => ({ ...e, currency: name }));
+        return entries.map((e) => ({
+            ...e,
+            currency: e.treasuryName
+                ? e.treasuryName.replace(/ Treasury$/, "")
+                : name,
+        }));
     });
 
     const nativePromise = apiGet(
