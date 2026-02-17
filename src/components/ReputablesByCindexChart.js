@@ -50,8 +50,6 @@ const ReputablesByCindexChart = ({ data }) => {
 
     const trendlineData = {...data}
     Object.keys(trendlineData).forEach(k => {
-        console.log(k)
-        console.log(offset)
         k = parseInt(k)
         if(k === maxCindex) trendlineData[k] = f(maxCindex - offset, lr.slope, lr.intercept)
         else if (k === maxCindex - numCycles) trendlineData[k] = f(0, lr.slope, lr.intercept)

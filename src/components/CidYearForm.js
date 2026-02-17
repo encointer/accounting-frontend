@@ -10,7 +10,7 @@ const CidYearForm = ({ handleSubmit }) => {
                     <label>Year</label>
                     <div className="control">
                         <div className="select">
-                            <select class="form-select" id="year" name="year">
+                            <select className="form-select" id="year" name="year">
                                 <option value="2026">2026</option>
                                 <option value="2025">2025</option>
                                 <option value="2024">2024</option>

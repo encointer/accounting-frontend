@@ -28,6 +28,8 @@ const TurnoverReport = () => {
                     `accounting/all-accounts-data?&cid=${cid}&year=${year}&includeCurrentMonth=true`
                 );
                 if (res.status === 403) {
+                    setShowSpinner(false);
+                    alert("Access denied. Please log in again.");
                     return;
                 }
                 if (res.ok) {
@@ -77,6 +79,8 @@ const TurnoverReport = () => {
                         `accounting/volume-report?&cid=${cid}&year=${year}`
                     );
                     if (volumesRes.status === 403) {
+                        setShowSpinner(false);
+                        alert("Access denied. Please log in again.");
                         return;
                     }
                     if (volumesRes.ok) {
