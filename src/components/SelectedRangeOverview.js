@@ -26,6 +26,8 @@ const SelectedRangeOverview = () => {
                 );
 
                 if (res.status === 403) {
+                    setShowSpinner(false);
+                    alert("Access denied. Please log in again.");
                     return;
                 }
 
@@ -46,9 +48,7 @@ const SelectedRangeOverview = () => {
         setShowSpinner(true);
         const start = new Date(e.target.form.start.value);
         const end = new Date(e.target.form.end.value);
-        end.setHours(end.getHours() + 23);
-        end.setMinutes(end.getMinutes() + 59);
-        end.setSeconds(end.getSeconds() + 59);
+        end.setHours(23, 59, 59);
         setCid(e.target.form.cid.value);
         setStart(start);
         setEnd(end);

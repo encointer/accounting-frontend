@@ -14,6 +14,8 @@ const RewardsChart = ({ cid }) => {
             if (cid) {
                 const res = await apiGet(`accounting/rewards-data?&cid=${cid}`);
                 if (res.status === 403) {
+                    setShowSpinner(false);
+                    alert("Access denied. Please log in again.");
                     return;
                 }
 
@@ -26,7 +28,6 @@ const RewardsChart = ({ cid }) => {
         };
         fetchData().catch(console.error);
     }, [cid]);
-    console.log(data);
     return (
         <div>
             {showSpinner && <Spinner />}

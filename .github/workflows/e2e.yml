@@ -1,0 +1,84 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: encointer/accounting-backend
+          path: backend
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: backend
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Start backend
+        env:
+          DB_URL: ${{ secrets.MONGODB_URL }}
+          SECRET_KEY: ci-test-secret
+        run: node backend/index.js &
+
+      - name: Wait for backend
+        run: |
+          for i in $(seq 1 120); do
+            if curl -sf http://localhost:8081/v1/communities/all-communities > /dev/null 2>&1; then
+              echo "Backend ready after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Backend failed to start within 120s"
+          exit 1
+
+      - name: Build frontend
+        env:
+          REACT_APP_API_URL: http://localhost:8081/v1
+        run: npm run build
+
+      - name: Serve frontend
+        run: npx serve -s build -l 3000 &
+
+      - name: Wait for frontend
+        run: |
+          for i in $(seq 1 15); do
+            if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+              echo "Frontend ready after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Frontend failed to start"
+          exit 1
+
+      - name: Run Playwright tests
+        env:
+          SECRET_KEY: ci-test-secret
+        run: npx playwright test
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

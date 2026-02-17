@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
     downloadDataUrl,
-    getMoneyVelocityReportCsv,
     getReputablesByCindexReportCsv,
 } from "../util";
 import Spinner from "./Spinner";

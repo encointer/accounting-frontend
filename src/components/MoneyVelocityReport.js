@@ -27,6 +27,8 @@ const MoneyVelocityReport = () => {
                     `accounting/money-velocity-report?&cid=${cid}&year=${year}&useTotalVolume=${useTotalVolume}`
                 );
                 if (res.status === 403) {
+                    setShowSpinner(false);
+                    alert("Access denied. Please log in again.");
                     return;
                 }
                 if (res.ok) {
@@ -46,7 +48,7 @@ const MoneyVelocityReport = () => {
             }
         };
         fetchData().catch(console.error);
-    }, [cid, year]);
+    }, [cid, year, useTotalVolume]);
 
     const handleDownloadReport = async () => {
         const csv = getMoneyVelocityReportCsv(data);
