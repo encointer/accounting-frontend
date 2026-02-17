@@ -1,6 +1,5 @@
 import PublicLayout from "./PublicLayout";
 import RewardsChart from "./RewardsChart";
-import SankeyChart from "./SankeyChart";
 
 const Home = () => {
   return (

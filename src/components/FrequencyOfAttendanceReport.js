@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import {
     downloadDataUrl,
-    getMoneyVelocityReportCsv,
     getReputablesByCindexReportCsv,
 } from "../util";
 import Spinner from "./Spinner";
 import InternalLayout from "./InternalLayout";
 import { apiGet } from "../api";
 import CidForm from "./CidForm";
-import ReputablesByCindexChart from "./ReputablesByCindexChart";
 import FrequenyOfAttendanceChart from "./FrequenyOfAttendanceChart";
 
 const FrequencyOfAttendanceReport = () => {
