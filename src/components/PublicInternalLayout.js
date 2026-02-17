@@ -48,6 +48,9 @@ const PublicInternalLayout = ({ children, communityName }) => {
                             <Link to="/selected-range">Selected Range</Link>
                         </div>
                         <div className="column is-narrow has-background-light m-1">
+                            <Link to="/transaction-history">Transaction History</Link>
+                        </div>
+                        <div className="column is-narrow has-background-light m-1">
                             <Link to="/change-password">Change Password</Link>
                         </div>
                         <LogoutButton me={me} />

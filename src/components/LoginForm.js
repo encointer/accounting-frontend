@@ -23,6 +23,7 @@ function LoginForm({ setMe }) {
         const me = await res.json();
         setMe(me);
         if(me.isAdmin || me.isReadonlyAdmin) navigate('/internal');
+        else navigate('/transaction-history');
     };
 
     return (
