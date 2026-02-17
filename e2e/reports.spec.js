@@ -36,4 +36,12 @@ test.describe("Authenticated report pages", () => {
     await expect(page.locator('select[name="year"]')).toBeVisible();
     await expect(page.locator('button:has-text("Submit")')).toBeVisible();
   });
+
+  test("/faucet-drips loads and renders charts", async ({ page }) => {
+    await page.goto("/faucet-drips");
+
+    await expect(page.locator("p", { hasText: "Faucet Drips" })).toBeVisible();
+    await expect(page.locator("canvas").first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("canvas")).toHaveCount(2);
+  });
 });

@@ -18,6 +18,7 @@ import ReputationsByCindexReport from "./components/ReputablesByCindexReport";
 import FrequencyOfAttendanceReport from "./components/FrequencyOfAttendanceReport";
 import TransactionActivityReport from "./components/TransactionActivityReport";
 import SankeyReport from "./components/SankeyReport";
+import FaucetDripsReport from "./components/FaucetDripsReport";
 
 export const MeContext = createContext({});
 
@@ -83,6 +84,10 @@ function App() {
                         element={<TransactionActivityReport />}
                     />
                     <Route path="/sankey-report" element={<SankeyReport />} />
+                    <Route
+                        path="/faucet-drips"
+                        element={<FaucetDripsReport />}
+                    />
                     <Route path="/add-user" element={<AddUser />} />
                     <Route path="/account-report" element={<AccountReport />} />
                     <Route path="/login-as" element={<LoginAs />} />

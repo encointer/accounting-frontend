@@ -105,6 +105,11 @@ const InternalLayout = ({ children }) => {
                                             Sankey Report
                                         </Link>
                                     </div>
+                                    <div className="dropdown-item">
+                                        <Link to="/faucet-drips">
+                                            Faucet Drips
+                                        </Link>
+                                    </div>
                                     {me.isAdmin && (
                                         <>
                                             <div className="dropdown-item">
