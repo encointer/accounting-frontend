@@ -7,7 +7,6 @@ import Spinner from "./Spinner";
 import InternalLayout from "./InternalLayout";
 import { apiGet } from "../api";
 import CidForm from "./CidForm";
-import ReputablesByCindexChart from "./ReputablesByCindexChart";
 import FrequencyOfAttendanceChart from "./FrequencyOfAttendanceChart";
 
 const FrequencyOfAttendanceReport = () => {
