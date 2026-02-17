@@ -4,7 +4,6 @@ import InternalLayout from "./InternalLayout";
 import { apiGet } from "../api";
 import SankeyChart from "./SankeyChart";
 import AccountStartEndForm from "./AccountStartEndForm";
-import CidSelect from "./CidSelect";
 
 const SankeyReport = () => {
     const [data, setData] = useState({});
@@ -35,7 +34,7 @@ const SankeyReport = () => {
             }
         };
         fetchData().catch(console.error);
-    }, [start, end, account]);
+    }, [start, end, account, cid]);
 
     const handleSubmitForm = (e) => {
         e.preventDefault();
