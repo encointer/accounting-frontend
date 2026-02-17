@@ -48,7 +48,7 @@ const MoneyVelocityReport = () => {
             }
         };
         fetchData().catch(console.error);
-    }, [cid, year]);
+    }, [cid, year, useTotalVolume]);
 
     const handleDownloadReport = async () => {
         const csv = getMoneyVelocityReportCsv(data);

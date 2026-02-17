@@ -6,7 +6,6 @@ import {
     round,
 } from "../util";
 import Spinner from "./Spinner";
-import CidForm from "./CidForm";
 import TurnoverTable from "./TurnoverTable";
 import InternalLayout from "./InternalLayout";
 import { apiGet } from "../api";
