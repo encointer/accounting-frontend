@@ -8,13 +8,27 @@ const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
 const BATCH_SIZE = 50;
 
 function deriveType(entry) {
-    if (entry.foreignAssetName) return "Swap";
     const cp = entry.counterParty;
     if (cp === "ISSUANCE") return "Issuance";
     if (cp === "TREASURY") return "Treasury Spend";
     if (cp === "XCMteleporter") return "XCM";
     if (cp === "FaucetDrip") return "Faucet Drip";
     return "Transfer";
+}
+
+function expandSwaps(entries) {
+    return entries.flatMap((e) => {
+        if (!e.foreignAssetName) return [e];
+        return [
+            { ...e, displayAmount: e.amount, displayCurrency: e.currency, displayType: "Swap" },
+            {
+                ...e,
+                displayAmount: e.foreignAssetAmount,
+                displayCurrency: e.foreignAssetName,
+                displayType: "Swap",
+            },
+        ];
+    });
 }
 
 function formatDate(timestamp) {
@@ -48,10 +62,7 @@ async function fetchAllTransactions(address, start, end) {
         );
         if (!res.ok) return [];
         const entries = await res.json();
-        return entries.map((e) => ({
-            ...e,
-            currency: e.foreignAssetName || name,
-        }));
+        return entries.map((e) => ({ ...e, currency: name }));
     });
 
     const nativePromise = apiGet(
@@ -157,12 +168,14 @@ const TransactionHistory = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {transactions.map((tx, i) => {
-                                const amount = parseFloat(tx.amount);
+                            {expandSwaps(transactions).map((tx, i) => {
+                                const amount = parseFloat(tx.displayAmount ?? tx.amount);
+                                const currency = tx.displayCurrency ?? tx.currency;
+                                const type = tx.displayType ?? deriveType(tx);
                                 return (
                                     <tr key={i}>
                                         <td>{formatDate(tx.timestamp)}</td>
-                                        <td>{deriveType(tx)}</td>
+                                        <td>{type}</td>
                                         <td>{tx.counterParty}</td>
                                         <td
                                             style={{
@@ -172,7 +185,7 @@ const TransactionHistory = () => {
                                             {amount >= 0 ? "+" : ""}
                                             {amount.toFixed(2)}
                                         </td>
-                                        <td>{tx.currency}</td>
+                                        <td>{currency}</td>
                                     </tr>
                                 );
                             })}
