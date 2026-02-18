@@ -18,6 +18,7 @@ import ReputationsByCindexReport from "./components/ReputablesByCindexReport";
 import FrequencyOfAttendanceReport from "./components/FrequencyOfAttendanceReport";
 import TransactionActivityReport from "./components/TransactionActivityReport";
 import SankeyReport from "./components/SankeyReport";
+import FlowGraphReport from "./components/FlowGraphReport";
 import FaucetDripsReport from "./components/FaucetDripsReport";
 import TransactionHistory from "./components/TransactionHistory";
 
@@ -85,6 +86,10 @@ function App() {
                         element={<TransactionActivityReport />}
                     />
                     <Route path="/sankey-report" element={<SankeyReport />} />
+                    <Route
+                        path="/community-flow"
+                        element={<FlowGraphReport />}
+                    />
                     <Route
                         path="/faucet-drips"
                         element={<FaucetDripsReport />}

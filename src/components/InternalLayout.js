@@ -106,6 +106,11 @@ const InternalLayout = ({ children }) => {
                                         </Link>
                                     </div>
                                     <div className="dropdown-item">
+                                        <Link to="/community-flow">
+                                            Community Flow
+                                        </Link>
+                                    </div>
+                                    <div className="dropdown-item">
                                         <Link to="/faucet-drips">
                                             Faucet Drips
                                         </Link>
