@@ -107,23 +107,13 @@ const FlowGraphReport = () => {
                 </div>
             </form>
             <br />
-            {showCircularitySpinner && <Spinner />}
-            {circularityData && (
-                <div>
-                    <p style={{ fontSize: "3.5vh" }}>
-                        Circularity Index — {communityName}
-                    </p>
-                    <CircularityChart data={circularityData} />
-                </div>
-            )}
-            <br />
             {showSpinner && <Spinner />}
             {data && data.nodes.length > 0 && (
                 <div>
                     <p style={{ fontSize: "3.5vh" }}>
                         {`Community Flow at ${communityName} \u2014 ${rangeLabel}`}
                     </p>
-                    <p style={{ fontSize: "1.5vh", marginBottom: "1em" }}>
+                    <p style={{ fontSize: "1.5vh", marginBottom: "0.5em" }}>
                         <span style={{ color: "#3273dc" }}>Blue</span>: acceptance points
                         {" | "}
                         <span style={{ color: "#ff9f43" }}>Orange</span>: vouchers
@@ -136,11 +126,31 @@ const FlowGraphReport = () => {
                         {" | "}
                         <span style={{ color: "#FFD700" }}>Gold</span>: circular (3+ nodes)
                     </p>
+                    <p style={{ fontSize: "1.5vh", color: "#666", marginBottom: "1em" }}>
+                        Node size reflects total transfer volume (incoming + outgoing).
+                        Edge thickness reflects transfer amount between two accounts.
+                    </p>
                     <FlowGraph nodes={data.nodes} edges={data.edges} />
                 </div>
             )}
             {data && data.nodes.length === 0 && (
                 <p>No transfers found for this period.</p>
+            )}
+            <br />
+            {showCircularitySpinner && <Spinner />}
+            {circularityData && (
+                <div>
+                    <p style={{ fontSize: "3.5vh" }}>
+                        Circularity Index — {communityName}
+                    </p>
+                    <p style={{ fontSize: "1.5vh", color: "#666", marginBottom: "1em" }}>
+                        The circularity index measures what fraction of transfer volume
+                        flows in closed cycles (A pays B, B pays C, C pays A, etc.).
+                        Higher values indicate a more self-sustaining local economy where
+                        community currency circulates rather than accumulating in sinks.
+                    </p>
+                    <CircularityChart data={circularityData} />
+                </div>
             )}
         </InternalLayout>
     );
