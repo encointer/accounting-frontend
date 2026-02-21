@@ -21,7 +21,8 @@ const defaultRange = [Math.max(0, maxIndex - 2), maxIndex];
 const FlowGraphReport = () => {
     const [data, setData] = useState(null);
     const [communityName, setCommunityName] = useState("");
-    const [circularityData, setCircularityData] = useState(null);
+    const [circularityRatio, setCircularityRatio] = useState(null);
+    const [circularityVolume, setCircularityVolume] = useState(null);
     const [showSpinner, setShowSpinner] = useState(false);
     const [showCircularitySpinner, setShowCircularitySpinner] = useState(false);
     const [rangeLabel, setRangeLabel] = useState("");
@@ -60,12 +61,20 @@ const FlowGraphReport = () => {
     }, []);
 
     const fetchCircularity = useCallback(async (cid) => {
-        setCircularityData(null);
+        setCircularityRatio(null);
+        setCircularityVolume(null);
         setShowCircularitySpinner(true);
         const res = await apiGet(`accounting/circularity?cid=${cid}`);
         if (res.ok) {
             const json = await res.json();
-            setCircularityData(json.data);
+            const ratios = {};
+            const volumes = {};
+            for (const [label, val] of Object.entries(json.data)) {
+                ratios[label] = val.ratio;
+                volumes[label] = Math.round(val.circularFlow * 100) / 100;
+            }
+            setCircularityRatio(ratios);
+            setCircularityVolume(volumes);
         }
         setShowCircularitySpinner(false);
     }, []);
@@ -138,7 +147,7 @@ const FlowGraphReport = () => {
             )}
             <br />
             {showCircularitySpinner && <Spinner />}
-            {circularityData && (
+            {circularityRatio && (
                 <div>
                     <p style={{ fontSize: "3.5vh" }}>
                         Circularity Index — {communityName}
@@ -149,7 +158,26 @@ const FlowGraphReport = () => {
                         Higher values indicate a more self-sustaining local economy where
                         community currency circulates rather than accumulating in sinks.
                     </p>
-                    <CircularityChart data={circularityData} />
+                    <CircularityChart data={circularityRatio} yMax={1} />
+                </div>
+            )}
+            <br />
+            {circularityVolume && (
+                <div>
+                    <p style={{ fontSize: "3.5vh" }}>
+                        Circular Flow Volume — {communityName}
+                    </p>
+                    <p style={{ fontSize: "1.5vh", color: "#666", marginBottom: "1em" }}>
+                        Absolute volume of community currency flowing in closed cycles
+                        per 3-month window, in currency units. Shows the scale of circular
+                        economic activity independent of total transfer volume.
+                    </p>
+                    <CircularityChart
+                        data={circularityVolume}
+                        label="Circular Flow Volume"
+                        yLabel="Volume (CC units)"
+                        color="rgba(232, 143, 107)"
+                    />
                 </div>
             )}
         </InternalLayout>

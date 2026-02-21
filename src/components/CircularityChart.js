@@ -1,7 +1,7 @@
 import { Scatter } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 
-const CircularityChart = ({ data }) => {
+const CircularityChart = ({ data, label = "Circularity Index", yLabel = "Circularity (0\u20131)", color = "rgba(50, 115, 220)", yMax }) => {
     Chart.register(...registerables);
     return (
         <div>
@@ -12,11 +12,11 @@ const CircularityChart = ({ data }) => {
                         datasets: [
                             {
                                 type: "line",
-                                label: "Circularity Index",
+                                label,
                                 data: Object.values(data),
                                 fill: false,
-                                borderColor: "rgba(50, 115, 220)",
-                                backgroundColor: "rgba(50, 115, 220)",
+                                borderColor: color,
+                                backgroundColor: color,
                                 yAxisID: "y0",
                             },
                         ],
@@ -24,7 +24,7 @@ const CircularityChart = ({ data }) => {
                     options={{
                         plugins: {
                             title: {
-                                text: "Circularity Index",
+                                text: label,
                                 display: false,
                             },
                             legend: {
@@ -56,10 +56,10 @@ const CircularityChart = ({ data }) => {
                             },
                             y0: {
                                 beginAtZero: true,
-                                max: 1,
+                                ...(yMax !== undefined && { max: yMax }),
                                 position: "left",
                                 title: {
-                                    text: "Circularity (0–1)",
+                                    text: yLabel,
                                     display: true,
                                     font: {
                                         size: 15,
