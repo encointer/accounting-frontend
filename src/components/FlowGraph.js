@@ -23,14 +23,20 @@ const FlowGraph = ({ nodes, edges }) => {
             if (adj[e.source]) adj[e.source].push(e.target);
         }
         const sccs = findSCCs(adj);
-        const cyclicNodes = new Set();
+        // Separate reciprocal pairs (SCC size 2) from true cycles (size 3+)
+        const reciprocalNodes = new Set();
+        const circularNodes = new Set();
         for (const scc of sccs) {
-            if (scc.length >= 2) scc.forEach((id) => cyclicNodes.add(id));
+            if (scc.length === 2) scc.forEach((id) => reciprocalNodes.add(id));
+            else if (scc.length >= 3) scc.forEach((id) => circularNodes.add(id));
         }
-        const cyclicEdges = new Set();
+        const reciprocalEdges = new Set();
+        const circularEdges = new Set();
         for (const e of edges) {
-            if (cyclicNodes.has(e.source) && cyclicNodes.has(e.target)) {
-                cyclicEdges.add(`${e.source}|${e.target}`);
+            if (circularNodes.has(e.source) && circularNodes.has(e.target)) {
+                circularEdges.add(`${e.source}|${e.target}`);
+            } else if (reciprocalNodes.has(e.source) && reciprocalNodes.has(e.target)) {
+                reciprocalEdges.add(`${e.source}|${e.target}`);
             }
         }
 
@@ -49,8 +55,8 @@ const FlowGraph = ({ nodes, edges }) => {
                 label: n.name,
                 type: n.type,
                 size: 20 + ((nodeFlows[n.id] || 0) / maxFlow) * 60,
-                borderColor: cyclicNodes.has(n.id) ? "#FFD700" : "#888",
-                borderWidth: cyclicNodes.has(n.id) ? 3 : 1,
+                borderColor: circularNodes.has(n.id) ? "#FFD700" : "#888",
+                borderWidth: circularNodes.has(n.id) ? 3 : 1,
             },
         }));
 
@@ -61,9 +67,11 @@ const FlowGraph = ({ nodes, edges }) => {
                 amount: e.amount,
                 count: e.count,
                 width: 1 + (e.amount / maxAmount) * 7,
-                color: cyclicEdges.has(`${e.source}|${e.target}`)
+                color: circularEdges.has(`${e.source}|${e.target}`)
                     ? "#FFD700"
-                    : "#ccc",
+                    : reciprocalEdges.has(`${e.source}|${e.target}`)
+                        ? "#999"
+                        : "#ccc",
             },
         }));
 

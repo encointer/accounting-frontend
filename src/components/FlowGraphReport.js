@@ -115,7 +115,9 @@ const FlowGraphReport = () => {
                         {" | "}
                         <span style={{ color: "#23d160" }}>Green</span>: personal
                         {" | "}
-                        <span style={{ color: "#FFD700" }}>Gold</span>: circular flows
+                        <span style={{ color: "#999" }}>Gray</span>: reciprocal
+                        {" | "}
+                        <span style={{ color: "#FFD700" }}>Gold</span>: circular (3+ nodes)
                     </p>
                     <FlowGraph nodes={data.nodes} edges={data.edges} />
                 </div>
