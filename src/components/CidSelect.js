@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef } from "react";
 import { apiGet } from "../api";
 
-const CidSelect = ({ value }) => {
+const CidSelect = forwardRef(({ value }, ref) => {
     const [cids, setCids] = useState([]);
 
     useEffect(() => {
@@ -19,7 +19,7 @@ const CidSelect = ({ value }) => {
                 <label>CID</label>
                 <div className="control">
                     <div className="select">
-                        <select name="cid" defaultValue={value}>
+                        <select name="cid" defaultValue={value} ref={ref}>
                             {cids.map((cid, idx) => (
                                 <option value={cid.cid} key={idx}>
                                     {cid.name}
@@ -31,6 +31,6 @@ const CidSelect = ({ value }) => {
             </div>
         );
     }
-};
+});
 
 export default CidSelect;
