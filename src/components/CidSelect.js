@@ -1,17 +1,21 @@
 import { useEffect, useState, forwardRef } from "react";
 import { apiGet } from "../api";
 
-const CidSelect = forwardRef(({ value }, ref) => {
+const CidSelect = forwardRef(({ value, onLoad }, ref) => {
     const [cids, setCids] = useState([]);
 
     useEffect(() => {
         const getCids = async () => {
             const res = await apiGet(`communities/all-communities`);
-            setCids(await res.json());
+            const data = await res.json();
+            setCids(data);
+            if (onLoad && data.length > 0) {
+                onLoad(value || data[0].cid);
+            }
         };
 
         getCids().catch(console.error);
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (cids) {
         return (

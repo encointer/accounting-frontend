@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import Spinner from "./Spinner";
 import InternalLayout from "./InternalLayout";
 import { apiGet } from "../api";
@@ -12,6 +12,12 @@ const monthNames = [
     "July", "August", "September", "October", "November", "December",
 ];
 
+const now = new Date();
+const maxIndex = MonthRangeSlider.yearMonthToIndex(
+    now.getUTCFullYear(), now.getUTCMonth()
+);
+const defaultRange = [Math.max(0, maxIndex - 2), maxIndex];
+
 const FlowGraphReport = () => {
     const [data, setData] = useState(null);
     const [communityName, setCommunityName] = useState("");
@@ -19,25 +25,19 @@ const FlowGraphReport = () => {
     const [showSpinner, setShowSpinner] = useState(false);
     const [showCircularitySpinner, setShowCircularitySpinner] = useState(false);
     const [rangeLabel, setRangeLabel] = useState("");
-
-    const now = new Date();
-    const maxIndex = MonthRangeSlider.yearMonthToIndex(
-        now.getUTCFullYear(), now.getUTCMonth()
-    );
-    const [range, setRange] = useState([Math.max(0, maxIndex - 5), maxIndex]);
+    const [range, setRange] = useState(defaultRange);
     const cidRef = useRef(null);
 
-    const fetchFlow = async () => {
-        const cid = cidRef.current?.value;
+    const fetchFlow = useCallback(async (cid, r) => {
         if (!cid) return;
 
         setData(null);
         setShowSpinner(true);
 
-        const start = MonthRangeSlider.indexToYearMonth(range[0]);
-        const end = MonthRangeSlider.indexToYearMonth(range[1]);
+        const start = MonthRangeSlider.indexToYearMonth(r[0]);
+        const end = MonthRangeSlider.indexToYearMonth(r[1]);
 
-        const params = range[0] === range[1]
+        const params = r[0] === r[1]
             ? `year=${start.year}&month=${start.month}`
             : `startYear=${start.year}&startMonth=${start.month}&endYear=${end.year}&endMonth=${end.month}`;
 
@@ -49,8 +49,7 @@ const FlowGraphReport = () => {
             setCommunityName(json.communityName);
             setData({ nodes: json.nodes, edges: json.edges });
 
-            // Build range label
-            if (range[0] === range[1]) {
+            if (r[0] === r[1]) {
                 setRangeLabel(`${monthNames[start.month]} ${start.year}`);
             } else {
                 setRangeLabel(
@@ -58,9 +57,9 @@ const FlowGraphReport = () => {
                 );
             }
         }
-    };
+    }, []);
 
-    const fetchCircularity = async (cid) => {
+    const fetchCircularity = useCallback(async (cid) => {
         setCircularityData(null);
         setShowCircularitySpinner(true);
         const res = await apiGet(`accounting/circularity?cid=${cid}`);
@@ -69,20 +68,28 @@ const FlowGraphReport = () => {
             setCircularityData(json.data);
         }
         setShowCircularitySpinner(false);
-    };
+    }, []);
+
+    const fetchAll = useCallback((cid, r) => {
+        fetchFlow(cid, r).catch(console.error);
+        fetchCircularity(cid).catch(console.error);
+    }, [fetchFlow, fetchCircularity]);
+
+    const handleCidLoad = useCallback((cid) => {
+        fetchAll(cid, defaultRange);
+    }, [fetchAll]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        fetchFlow().catch(console.error);
         const cid = cidRef.current?.value;
-        if (cid) fetchCircularity(cid).catch(console.error);
+        if (cid) fetchAll(cid, range);
     };
 
     return (
         <InternalLayout>
             <form>
                 <div style={{ width: "min(100%, 600px)" }}>
-                    <CidSelect ref={cidRef} />
+                    <CidSelect ref={cidRef} onLoad={handleCidLoad} />
                     <div style={{ margin: "16px 0" }}>
                         <label>Month Range</label>
                         <MonthRangeSlider value={range} onChange={setRange} />
@@ -99,6 +106,16 @@ const FlowGraphReport = () => {
                     </div>
                 </div>
             </form>
+            <br />
+            {showCircularitySpinner && <Spinner />}
+            {circularityData && (
+                <div>
+                    <p style={{ fontSize: "3.5vh" }}>
+                        Circularity Index — {communityName}
+                    </p>
+                    <CircularityChart data={circularityData} />
+                </div>
+            )}
             <br />
             {showSpinner && <Spinner />}
             {data && data.nodes.length > 0 && (
@@ -124,16 +141,6 @@ const FlowGraphReport = () => {
             )}
             {data && data.nodes.length === 0 && (
                 <p>No transfers found for this period.</p>
-            )}
-            <br />
-            {showCircularitySpinner && <Spinner />}
-            {circularityData && (
-                <div>
-                    <p style={{ fontSize: "3.5vh" }}>
-                        Circularity Index — {communityName}
-                    </p>
-                    <CircularityChart data={circularityData} />
-                </div>
             )}
         </InternalLayout>
     );
