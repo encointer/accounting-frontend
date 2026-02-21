@@ -18,6 +18,9 @@ const maxIndex = MonthRangeSlider.yearMonthToIndex(
 );
 const defaultRange = [Math.max(0, maxIndex - 2), maxIndex];
 
+// Generation counter to discard stale responses
+let fetchGen = 0;
+
 const FlowGraphReport = () => {
     const [data, setData] = useState(null);
     const [communityName, setCommunityName] = useState("");
@@ -29,7 +32,7 @@ const FlowGraphReport = () => {
     const [range, setRange] = useState(defaultRange);
     const cidRef = useRef(null);
 
-    const fetchFlow = useCallback(async (cid, r) => {
+    const fetchFlow = useCallback(async (cid, r, gen) => {
         if (!cid) return;
 
         setData(null);
@@ -43,9 +46,11 @@ const FlowGraphReport = () => {
             : `startYear=${start.year}&startMonth=${start.month}&endYear=${end.year}&endMonth=${end.month}`;
 
         const res = await apiGet(`accounting/community-flow?cid=${cid}&${params}`);
+        if (gen !== fetchGen) return; // stale
         if (res.status === 403) { setShowSpinner(false); return; }
         if (res.ok) {
             const json = await res.json();
+            if (gen !== fetchGen) return; // stale
             setShowSpinner(false);
             setCommunityName(json.communityName);
             setData({ nodes: json.nodes, edges: json.edges });
@@ -60,13 +65,15 @@ const FlowGraphReport = () => {
         }
     }, []);
 
-    const fetchCircularity = useCallback(async (cid) => {
+    const fetchCircularity = useCallback(async (cid, gen) => {
         setCircularityRatio(null);
         setCircularityVolume(null);
         setShowCircularitySpinner(true);
         const res = await apiGet(`accounting/circularity?cid=${cid}`);
+        if (gen !== fetchGen) return; // stale
         if (res.ok) {
             const json = await res.json();
+            if (gen !== fetchGen) return; // stale
             const ratios = {};
             const volumes = {};
             for (const [label, val] of Object.entries(json.data)) {
@@ -80,8 +87,9 @@ const FlowGraphReport = () => {
     }, []);
 
     const fetchAll = useCallback((cid, r) => {
-        fetchFlow(cid, r).catch(console.error);
-        fetchCircularity(cid).catch(console.error);
+        const gen = ++fetchGen;
+        fetchFlow(cid, r, gen).catch(console.error);
+        fetchCircularity(cid, gen).catch(console.error);
     }, [fetchFlow, fetchCircularity]);
 
     const handleCidLoad = useCallback((cid) => {
