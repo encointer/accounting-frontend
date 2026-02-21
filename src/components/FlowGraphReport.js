@@ -74,14 +74,16 @@ const FlowGraphReport = () => {
         if (res.ok) {
             const json = await res.json();
             if (gen !== fetchGen) return; // stale
-            const ratios = {};
-            const volumes = {};
-            for (const [label, val] of Object.entries(json.data)) {
-                ratios[label] = val.ratio;
-                volumes[label] = Math.round(val.circularFlow * 100) / 100;
+            // Build { labels: [...], series: { ">=2": [...], ">=3": [...], ... } }
+            const labels = Object.keys(json.data);
+            const ratioSeries = {};
+            const volumeSeries = {};
+            for (const k of [2, 3, 4, 5]) {
+                ratioSeries[k] = labels.map((l) => json.data[l].ratio[k] || 0);
+                volumeSeries[k] = labels.map((l) => Math.round((json.data[l].circularFlow[k] || 0) * 100) / 100);
             }
-            setCircularityRatio(ratios);
-            setCircularityVolume(volumes);
+            setCircularityRatio({ labels, series: ratioSeries });
+            setCircularityVolume({ labels, series: volumeSeries });
         }
         setShowCircularitySpinner(false);
     }, []);
@@ -182,9 +184,7 @@ const FlowGraphReport = () => {
                     </p>
                     <CircularityChart
                         data={circularityVolume}
-                        label="Circular Flow Volume"
                         yLabel="Volume (CC units)"
-                        color="rgba(232, 143, 107)"
                     />
                 </div>
             )}
