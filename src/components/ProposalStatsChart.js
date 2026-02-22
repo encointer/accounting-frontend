@@ -12,7 +12,7 @@ const ProposalStatsChart = ({ proposals }) => {
     );
 
     return (
-        <div>
+        <div style={{ position: "relative", width: "100%" }}>
             <Scatter
                 data={{
                     labels,
@@ -64,6 +64,8 @@ const ProposalStatsChart = ({ proposals }) => {
                 }}
                 options={{
                     indexAxis: "y",
+                    responsive: true,
+                    maintainAspectRatio: true,
                     plugins: {
                         legend: {
                             labels: {

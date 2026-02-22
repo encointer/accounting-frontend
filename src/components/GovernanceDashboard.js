@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { apiGet } from "../api";
 import PublicLayout from "./PublicLayout";
 import ProposalStatsChart from "./ProposalStatsChart";
@@ -17,6 +17,7 @@ const GovernanceDashboard = () => {
     const [proposals, setProposals] = useState([]);
     const [voteTiming, setVoteTiming] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [communityFilter, setCommunityFilter] = useState("all");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -36,6 +37,22 @@ const GovernanceDashboard = () => {
         fetchData();
     }, []);
 
+    // Distinct community IDs for the filter dropdown
+    const communities = useMemo(() => {
+        const set = new Set();
+        proposals.forEach((p) => {
+            if (p.communityId) set.add(p.communityId);
+        });
+        return [...set].sort();
+    }, [proposals]);
+
+    const filtered = useMemo(() => {
+        if (communityFilter === "all") return proposals;
+        if (communityFilter === "global")
+            return proposals.filter((p) => !p.communityId);
+        return proposals.filter((p) => p.communityId === communityFilter);
+    }, [proposals, communityFilter]);
+
     if (loading) {
         return (
             <PublicLayout>
@@ -49,6 +66,26 @@ const GovernanceDashboard = () => {
     return (
         <PublicLayout>
             <h2 className="title is-4">Governance Dashboard</h2>
+
+            <div className="field">
+                <label className="label is-small">Community</label>
+                <div className="control">
+                    <div className="select is-small">
+                        <select
+                            value={communityFilter}
+                            onChange={(e) => setCommunityFilter(e.target.value)}
+                        >
+                            <option value="all">All</option>
+                            <option value="global">Global only</option>
+                            {communities.map((c) => (
+                                <option key={c} value={c}>
+                                    {c}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             <div className="table-container">
                 <table className="table is-striped is-fullwidth is-size-7">
@@ -68,7 +105,7 @@ const GovernanceDashboard = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {proposals.map((p) => (
+                        {filtered.map((p) => (
                             <tr key={p.id}>
                                 <td>{p.id}</td>
                                 <td title={p.actionSummary}>
@@ -109,22 +146,22 @@ const GovernanceDashboard = () => {
                 </table>
             </div>
 
-            {proposals.length > 0 && (
+            {filtered.length > 0 && (
                 <>
                     <h3 className="title is-5 mt-5">
                         Proposal Statistics
                     </h3>
-                    <ProposalStatsChart proposals={proposals} />
+                    <ProposalStatsChart proposals={filtered} />
                 </>
             )}
 
-            {voteTiming && proposals.length > 0 && (
+            {voteTiming && filtered.length > 0 && (
                 <>
                     <h3 className="title is-5 mt-5">Vote Timing</h3>
                     <VoteTimingChart
                         votes={voteTiming.votes}
                         attestingWindows={voteTiming.attestingWindows}
-                        proposals={proposals}
+                        proposals={filtered}
                     />
                 </>
             )}

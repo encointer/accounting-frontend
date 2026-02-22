@@ -57,7 +57,7 @@ const VoteTimingChart = ({ votes, attestingWindows, proposals }) => {
     const maxId = Math.max(...proposalIds);
 
     return (
-        <div>
+        <div style={{ position: "relative", width: "100%" }}>
             <Scatter
                 data={{
                     datasets: [
@@ -78,6 +78,8 @@ const VoteTimingChart = ({ votes, attestingWindows, proposals }) => {
                     ],
                 }}
                 options={{
+                    responsive: true,
+                    maintainAspectRatio: true,
                     plugins: {
                         annotation: { annotations },
                         legend: {
@@ -114,11 +116,15 @@ const VoteTimingChart = ({ votes, attestingWindows, proposals }) => {
                             },
                             ticks: {
                                 stepSize: 1,
-                                callback: (v) => Number.isInteger(v) ? v : "",
                                 font: { size: 13, family: "Poppins" },
                             },
-                            min: minId - 0.5,
-                            max: maxId + 0.5,
+                            min: minId,
+                            max: maxId,
+                            afterBuildTicks: (axis) => {
+                                axis.ticks = axis.ticks.filter(
+                                    (t) => Number.isInteger(t.value)
+                                );
+                            },
                         },
                     },
                 }}
