@@ -71,3 +71,15 @@ npm run deploy
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## local testing with backend
+
+```bash
+accounting-backend$ node index.js
+
+accounting-frontend$ npm start
+
+```
+
+visit in your browser (not localhost, use the IP)
+http://127.0.0.1:3000/
