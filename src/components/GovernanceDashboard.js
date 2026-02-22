@@ -37,13 +37,15 @@ const GovernanceDashboard = () => {
         fetchData();
     }, []);
 
-    // Distinct community IDs for the filter dropdown
+    // Distinct communities for the filter dropdown, with names
     const communities = useMemo(() => {
-        const set = new Set();
+        const map = {};
         proposals.forEach((p) => {
-            if (p.communityId) set.add(p.communityId);
+            if (p.communityId && !map[p.communityId]) {
+                map[p.communityId] = p.communityName || p.communityId;
+            }
         });
-        return [...set].sort();
+        return Object.entries(map).sort((a, b) => a[1].localeCompare(b[1]));
     }, [proposals]);
 
     const filtered = useMemo(() => {
@@ -77,9 +79,9 @@ const GovernanceDashboard = () => {
                         >
                             <option value="all">All</option>
                             <option value="global">Global only</option>
-                            {communities.map((c) => (
-                                <option key={c} value={c}>
-                                    {c}
+                            {communities.map(([cid, name]) => (
+                                <option key={cid} value={cid}>
+                                    {name}
                                 </option>
                             ))}
                         </select>
