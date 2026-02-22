@@ -15,16 +15,16 @@ const VoteTimingChart = ({ votes, attestingWindows, proposals }) => {
         proposalLifetime[p.id] = p.proposalLifetime;
     });
 
-    const msToHours = (ms) => ms / (1000 * 3600);
+    const msToDays = (ms) => ms / (1000 * 3600 * 24);
 
-    // Scatter points: vote offset in hours from proposal start
+    // Scatter points: vote offset in days from proposal start
     const ayePoints = [];
     const nayPoints = [];
     votes.forEach((v) => {
         const start = proposalStart[v.proposalId];
         if (start === undefined) return;
-        const offsetHours = msToHours(v.timestamp - start);
-        const point = { x: offsetHours, y: v.proposalId };
+        const offsetDays = msToDays(v.timestamp - start);
+        const point = { x: offsetDays, y: v.proposalId };
         if (v.vote === "Aye") ayePoints.push(point);
         else nayPoints.push(point);
     });
@@ -37,8 +37,8 @@ const VoteTimingChart = ({ votes, attestingWindows, proposals }) => {
         const pEnd = pStart + (p.proposalLifetime || 0);
         attestingWindows.forEach((w) => {
             if (w.end < pStart || w.start > pEnd) return;
-            const xMin = msToHours(Math.max(w.start, pStart) - pStart);
-            const xMax = msToHours(Math.min(w.end, pEnd) - pStart);
+            const xMin = msToDays(Math.max(w.start, pStart) - pStart);
+            const xMax = msToDays(Math.min(w.end, pEnd) - pStart);
             annotations[`att_${idx++}`] = {
                 type: "box",
                 xMin,
@@ -88,7 +88,7 @@ const VoteTimingChart = ({ votes, attestingWindows, proposals }) => {
                         tooltip: {
                             callbacks: {
                                 label: (ctx) =>
-                                    `Proposal #${ctx.raw.y} — ${ctx.dataset.label} at ${ctx.raw.x.toFixed(1)}h`,
+                                    `Proposal #${ctx.raw.y} — ${ctx.dataset.label} at day ${ctx.raw.x.toFixed(1)}`,
                             },
                         },
                     },
@@ -96,11 +96,12 @@ const VoteTimingChart = ({ votes, attestingWindows, proposals }) => {
                         x: {
                             type: "linear",
                             title: {
-                                text: "Hours since proposal submission",
+                                text: "Days since proposal submission",
                                 display: true,
                                 font: { size: 15, family: "Poppins" },
                             },
                             ticks: {
+                                stepSize: 1,
                                 font: { size: 13, family: "Poppins" },
                             },
                         },
@@ -113,6 +114,7 @@ const VoteTimingChart = ({ votes, attestingWindows, proposals }) => {
                             },
                             ticks: {
                                 stepSize: 1,
+                                callback: (v) => Number.isInteger(v) ? v : "",
                                 font: { size: 13, family: "Poppins" },
                             },
                             min: minId - 0.5,

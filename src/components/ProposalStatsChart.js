@@ -4,8 +4,10 @@ import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
 
 const ProposalStatsChart = ({ proposals }) => {
-    const labels = proposals.map((p) => `#${p.id}`);
-    const thresholdAbsolute = proposals.map(
+    // Reverse so newest is on top
+    const sorted = [...proposals].reverse();
+    const labels = sorted.map((p) => `#${p.id}`);
+    const thresholdAbsolute = sorted.map(
         (p) => (p.thresholdPct / 100) * p.turnout
     );
 
@@ -18,29 +20,32 @@ const ProposalStatsChart = ({ proposals }) => {
                         {
                             type: "bar",
                             label: "Electorate",
-                            data: proposals.map((p) => p.electorateSize),
+                            data: sorted.map((p) => p.electorateSize),
                             backgroundColor: "rgba(180, 180, 180, 0.5)",
                             borderColor: "rgba(180, 180, 180, 1)",
                             borderWidth: 1,
-                            yAxisID: "y0",
+                            xAxisID: "x0",
+                            indexAxis: "y",
                         },
                         {
                             type: "bar",
                             label: "Turnout",
-                            data: proposals.map((p) => p.turnout),
+                            data: sorted.map((p) => p.turnout),
                             backgroundColor: "rgba(54, 162, 235, 0.6)",
                             borderColor: "rgba(54, 162, 235, 1)",
                             borderWidth: 1,
-                            yAxisID: "y0",
+                            xAxisID: "x0",
+                            indexAxis: "y",
                         },
                         {
                             type: "bar",
                             label: "Ayes",
-                            data: proposals.map((p) => p.ayes),
+                            data: sorted.map((p) => p.ayes),
                             backgroundColor: "rgba(75, 192, 75, 0.6)",
                             borderColor: "rgba(75, 192, 75, 1)",
                             borderWidth: 1,
-                            yAxisID: "y0",
+                            xAxisID: "x0",
+                            indexAxis: "y",
                         },
                         {
                             type: "line",
@@ -52,11 +57,13 @@ const ProposalStatsChart = ({ proposals }) => {
                             borderDash: [5, 5],
                             pointRadius: 4,
                             fill: false,
-                            yAxisID: "y0",
+                            xAxisID: "x0",
+                            indexAxis: "y",
                         },
                     ],
                 }}
                 options={{
+                    indexAxis: "y",
                     plugins: {
                         legend: {
                             labels: {
@@ -65,7 +72,7 @@ const ProposalStatsChart = ({ proposals }) => {
                         },
                     },
                     scales: {
-                        x: {
+                        y: {
                             type: "category",
                             title: {
                                 text: "Proposal",
@@ -76,9 +83,9 @@ const ProposalStatsChart = ({ proposals }) => {
                                 font: { size: 13, family: "Poppins" },
                             },
                         },
-                        y0: {
+                        x0: {
                             beginAtZero: true,
-                            position: "left",
+                            position: "bottom",
                             title: {
                                 text: "Vote Count",
                                 display: true,
