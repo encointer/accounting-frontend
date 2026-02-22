@@ -29,6 +29,9 @@ const PublicLayout = ({ children }) => {
                 <>
                     <div className="column"></div>
                     <div className="column is-narrow has-background-light m-1">
+                        <Link to="/governance">Governance</Link>
+                    </div>
+                    <div className="column is-narrow has-background-light m-1">
                         <Link to="/account-report">Login</Link>
                     </div>
                 </>

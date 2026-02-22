@@ -21,6 +21,7 @@ import SankeyReport from "./components/SankeyReport";
 import FlowGraphReport from "./components/FlowGraphReport";
 import FaucetDripsReport from "./components/FaucetDripsReport";
 import TransactionHistory from "./components/TransactionHistory";
+import GovernanceDashboard from "./components/GovernanceDashboard";
 
 export const MeContext = createContext({});
 
@@ -45,6 +46,10 @@ function App() {
             <div className="App">
                 <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route
+                        path="/governance"
+                        element={<GovernanceDashboard />}
+                    />
                     <Route
                         path="/internal"
                         element={
