@@ -108,7 +108,15 @@ const GovernanceDashboard = () => {
                         {filtered.map((p) => (
                             <tr key={p.id}>
                                 <td>{p.id}</td>
-                                <td title={p.actionSummary}>
+                                <td
+                                    title={p.actionSummary}
+                                    style={{
+                                        maxWidth: "300px",
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                        whiteSpace: "nowrap",
+                                    }}
+                                >
                                     {p.actionSummary}
                                 </td>
                                 <td>
