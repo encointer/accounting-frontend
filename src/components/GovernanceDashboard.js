@@ -3,6 +3,7 @@ import { apiGet } from "../api";
 import PublicLayout from "./PublicLayout";
 import ProposalStatsChart from "./ProposalStatsChart";
 import VoteTimingChart from "./VoteTimingChart";
+import VotingPowerChart from "./VotingPowerChart";
 
 const stateColor = {
     Enacted: "success",
@@ -16,18 +17,21 @@ const stateColor = {
 const GovernanceDashboard = () => {
     const [proposals, setProposals] = useState([]);
     const [voteTiming, setVoteTiming] = useState(null);
+    const [votingPower, setVotingPower] = useState(null);
     const [loading, setLoading] = useState(true);
     const [communityFilter, setCommunityFilter] = useState("all");
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [propRes, voteRes] = await Promise.all([
+                const [propRes, voteRes, vpRes] = await Promise.all([
                     apiGet("governance/proposals"),
                     apiGet("governance/vote-timing"),
+                    apiGet("governance/voting-power-analysis"),
                 ]);
                 if (propRes.ok) setProposals(await propRes.json());
                 if (voteRes.ok) setVoteTiming(await voteRes.json());
+                if (vpRes.ok) setVotingPower(await vpRes.json());
             } catch (e) {
                 console.error("Failed to fetch governance data", e);
             } finally {
@@ -54,6 +58,14 @@ const GovernanceDashboard = () => {
             return proposals.filter((p) => !p.communityId);
         return proposals.filter((p) => p.communityId === communityFilter);
     }, [proposals, communityFilter]);
+
+    const filteredVP = useMemo(() => {
+        if (!votingPower?.proposals) return [];
+        if (communityFilter === "all") return votingPower.proposals;
+        if (communityFilter === "global")
+            return votingPower.proposals.filter((p) => !p.communityId);
+        return votingPower.proposals.filter((p) => p.communityId === communityFilter);
+    }, [votingPower, communityFilter]);
 
     if (loading) {
         return (
@@ -162,6 +174,16 @@ const GovernanceDashboard = () => {
                         Proposal Statistics
                     </h3>
                     <ProposalStatsChart proposals={filtered} />
+                </>
+            )}
+
+            {filteredVP.length > 0 && (
+                <>
+                    <h3 className="title is-5 mt-5">Voting Power Analysis</h3>
+                    <VotingPowerChart
+                        proposals={filteredVP}
+                        reputationLifetime={votingPower?.reputationLifetime}
+                    />
                 </>
             )}
 
