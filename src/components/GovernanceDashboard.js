@@ -180,7 +180,10 @@ const GovernanceDashboard = () => {
             {filteredVP.length > 0 && (
                 <>
                     <h3 className="title is-5 mt-5">Voting Power Analysis</h3>
-                    <VotingPowerChart proposals={filteredVP} />
+                    <VotingPowerChart
+                        proposals={filteredVP}
+                        reputationLifetime={votingPower?.reputationLifetime}
+                    />
                 </>
             )}
 

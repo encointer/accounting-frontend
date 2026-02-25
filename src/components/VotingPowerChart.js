@@ -1,18 +1,12 @@
 import { Bar } from "react-chartjs-2";
 import { useMemo } from "react";
 
-const VotingPowerChart = ({ proposals }) => {
+const VotingPowerChart = ({ proposals, reputationLifetime }) => {
     const { histogram, participation, summary } = useMemo(() => {
         if (!proposals.length) return {};
 
-        // Collect all power levels across proposals
-        const allPowers = new Set();
-        for (const p of proposals) {
-            for (const k of Object.keys(p.votersByPower)) allPowers.add(Number(k));
-            for (const k of Object.keys(p.electorateByPower)) allPowers.add(Number(k));
-        }
-        const powers = [...allPowers].sort((a, b) => a - b);
-        if (!powers.length) return {};
+        const maxPower = (reputationLifetime || 5) - 1;
+        const powers = Array.from({ length: maxPower }, (_, i) => i + 1);
 
         // Histogram: fraction of voters at each power level, averaged over proposals
         const histogramData = powers.map((power) => {
@@ -40,32 +34,32 @@ const VotingPowerChart = ({ proposals }) => {
             return count > 0 ? sum / count : 0;
         });
 
-        // Summary stats
-        let totalVotes = 0,
-            totalVoters = 0,
-            totalElectorate = 0,
-            totalElectorateVotes = 0;
+        // Normalized variance of voting power among voters (0 = perfect 1p1v)
+        let allVoterPowers = [];
         for (const p of proposals) {
             for (const [pw, n] of Object.entries(p.votersByPower)) {
-                totalVotes += Number(pw) * n;
-                totalVoters += n;
+                for (let i = 0; i < n; i++) allVoterPowers.push(Number(pw));
             }
-            for (const [pw, n] of Object.entries(p.electorateByPower)) {
-                totalElectorateVotes += Number(pw) * n;
-                totalElectorate += n;
-            }
+        }
+        let normalizedVariance = 0;
+        if (allVoterPowers.length > 0) {
+            const mean = allVoterPowers.reduce((a, b) => a + b, 0) / allVoterPowers.length;
+            const variance = allVoterPowers.reduce((s, v) => s + (v - mean) ** 2, 0) / allVoterPowers.length;
+            normalizedVariance = mean > 0 ? variance / (mean * mean) : 0; // coefficient of variation squared
         }
 
         return {
             histogram: { labels: powers, data: histogramData },
             participation: { labels: powers, data: participationData },
             summary: {
-                avgPowerVoters: totalVoters > 0 ? totalVotes / totalVoters : 0,
-                avgPowerElectorate: totalElectorate > 0 ? totalElectorateVotes / totalElectorate : 0,
+                normalizedVariance,
+                avgPower: allVoterPowers.length > 0
+                    ? allVoterPowers.reduce((a, b) => a + b, 0) / allVoterPowers.length
+                    : 0,
                 proposalCount: proposals.length,
             },
         };
-    }, [proposals]);
+    }, [proposals, reputationLifetime]);
 
     if (!histogram || !participation) return null;
 
@@ -76,6 +70,12 @@ const VotingPowerChart = ({ proposals }) => {
 
     return (
         <div>
+            <p className="is-size-7 mb-3">
+                Voting power inequality (CV&sup2;): <strong>{summary.normalizedVariance.toFixed(3)}</strong>
+                {" "}&mdash; 0 = perfect 1p1v, higher = more unequal.
+                Avg power among voters: {summary.avgPower.toFixed(2)}.
+                Based on {summary.proposalCount} proposals.
+            </p>
             <div className="columns">
                 <div className="column">
                     <Bar
@@ -119,10 +119,6 @@ const VotingPowerChart = ({ proposals }) => {
                             },
                         }}
                     />
-                    <p className="has-text-grey is-size-7 mt-1">
-                        Ideal 1p1v: 100% at 1 rep. Avg power among voters:{" "}
-                        {summary.avgPowerVoters.toFixed(2)}. Averaged over {summary.proposalCount} proposals.
-                    </p>
                 </div>
                 <div className="column">
                     <Bar
@@ -170,10 +166,6 @@ const VotingPowerChart = ({ proposals }) => {
                             },
                         }}
                     />
-                    <p className="has-text-grey is-size-7 mt-1">
-                        Avg power in electorate: {summary.avgPowerElectorate.toFixed(2)}. Per-proposal average over
-                        proposals with eligible voters at that level.
-                    </p>
                 </div>
             </div>
         </div>
