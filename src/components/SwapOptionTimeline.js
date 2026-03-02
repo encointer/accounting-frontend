@@ -46,7 +46,7 @@ const SwapOptionTimeline = ({
             borderColor: "rgba(62, 142, 208, 1)",
             backgroundColor: "rgba(62, 142, 208, 0.1)",
             fill: true,
-            tension: 0.1,
+            stepped: "before",
             pointRadius: 1,
             borderWidth: 2,
         };
