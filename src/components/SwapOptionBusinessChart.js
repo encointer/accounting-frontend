@@ -1,25 +1,26 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { Bar } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 
 Chart.register(...registerables);
 
-// Plugin: draw inline stack labels to the right of each bar group for every row
+// Local plugin (not globally registered) — draws inline stack labels
 const inlineLegendPlugin = {
     id: "inlineLegend",
     afterDraw(chart) {
-        if (!chart.scales.x) return;
+        if (!chart.scales.x || !chart.options.plugins.inlineLegend?.enabled) return;
         const meta0 = chart.getDatasetMeta(0);
         if (!meta0 || !meta0.data.length) return;
 
         const ctx = chart.ctx;
-        // Collect max x and y per stack per data index
         const stackBars = {};
         chart.data.datasets.forEach((ds, di) => {
             const meta = chart.getDatasetMeta(di);
             if (meta.hidden) return;
             const stack = ds.stack;
-            if (!stackBars[stack]) stackBars[stack] = { label: ds.stackLabel || stack, rows: {} };
+            const label = ds.stackLabel;
+            if (!label) return;
+            if (!stackBars[stack]) stackBars[stack] = { label, rows: {} };
             meta.data.forEach((bar, i) => {
                 if (!stackBars[stack].rows[i]) stackBars[stack].rows[i] = { x: 0, y: bar.y };
                 if (bar.x > stackBars[stack].rows[i].x) stackBars[stack].rows[i].x = bar.x;
@@ -43,9 +44,9 @@ const inlineLegendPlugin = {
     },
 };
 
-Chart.register(inlineLegendPlugin);
-
 const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
+    const chartRef = useRef(null);
+
     const { data, options } = useMemo(() => {
         if (!businesses || businesses.length === 0) return { data: null, options: null };
 
@@ -64,6 +65,7 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
         );
 
         const datasets = [
+            // Swap options stack
             {
                 label: `Exercised (${assetLabel})`,
                 data: sorted.map((b) => b.swapOptions[assetKey].exercised),
@@ -95,6 +97,7 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
                 stack: "swap",
                 stackLabel: "Swap",
             },
+            // CC influx stack: transfers by recency, then ceremony issuance on top
             {
                 label: "CC influx (this month)",
                 data: sorted.map((b) => b.ccInfluxCurrentMonth || 0),
@@ -112,28 +115,22 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
             {
                 label: "CC influx (older)",
                 data: sorted.map((b) => b.ccInfluxOlder || 0),
-                backgroundColor: "rgba(200, 200, 200, 0.5)",
+                backgroundColor: "rgba(160, 140, 130, 0.6)",
                 stack: "ccInflux",
                 stackLabel: "CC influx",
             },
             {
                 label: "Ceremony issuance (all-time)",
                 data: sorted.map((b) => b.ccCeremonyIssuance || 0),
-                backgroundColor: "rgba(180, 180, 180, 0.4)",
+                backgroundColor: "rgba(210, 210, 210, 0.5)",
                 stack: "ccInflux",
                 stackLabel: "CC influx",
             },
+            // CC outflow stack: non-circular first, then 4+, 3, 2 (big cycles → small)
             {
-                label: "CC outflow: 2-cycle",
-                data: sorted.map((b) => b.ccOutflow.outflow2),
-                backgroundColor: "rgba(255, 215, 0, 0.7)",
-                stack: "circ",
-                stackLabel: "CC outflow",
-            },
-            {
-                label: "CC outflow: 3-cycle",
-                data: sorted.map((b) => b.ccOutflow.outflow3),
-                backgroundColor: "rgba(255, 165, 0, 0.7)",
+                label: "CC outflow: non-circular",
+                data: sorted.map((b) => b.ccOutflow.outflowNonCircular),
+                backgroundColor: "rgba(255, 230, 130, 0.6)",
                 stack: "circ",
                 stackLabel: "CC outflow",
             },
@@ -145,9 +142,16 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
                 stackLabel: "CC outflow",
             },
             {
-                label: "CC outflow: non-circular",
-                data: sorted.map((b) => b.ccOutflow.outflowNonCircular),
-                backgroundColor: "rgba(200, 200, 200, 0.5)",
+                label: "CC outflow: 3-cycle",
+                data: sorted.map((b) => b.ccOutflow.outflow3),
+                backgroundColor: "rgba(255, 165, 0, 0.7)",
+                stack: "circ",
+                stackLabel: "CC outflow",
+            },
+            {
+                label: "CC outflow: 2-cycle",
+                data: sorted.map((b) => b.ccOutflow.outflow2),
+                backgroundColor: "rgba(255, 215, 0, 0.7)",
                 stack: "circ",
                 stackLabel: "CC outflow",
             },
@@ -184,6 +188,7 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
                             label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.x.toFixed(2)}`,
                         },
                     },
+                    inlineLegend: { enabled: true },
                 },
             },
         };
@@ -197,7 +202,7 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
 
     return (
         <div style={{ height: `${height}px`, maxWidth: "100%", overflow: "hidden" }}>
-            <Bar data={data} options={options} />
+            <Bar ref={chartRef} data={data} options={options} plugins={[inlineLegendPlugin]} />
         </div>
     );
 };
