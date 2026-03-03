@@ -22,6 +22,7 @@ import FlowGraphReport from "./components/FlowGraphReport";
 import FaucetDripsReport from "./components/FaucetDripsReport";
 import TransactionHistory from "./components/TransactionHistory";
 import GovernanceDashboard from "./components/GovernanceDashboard";
+import SwapOptionAnalysis from "./components/SwapOptionAnalysis";
 
 export const MeContext = createContext({});
 
@@ -49,6 +50,10 @@ function App() {
                     <Route
                         path="/governance"
                         element={<GovernanceDashboard />}
+                    />
+                    <Route
+                        path="/swap-option-analysis"
+                        element={<SwapOptionAnalysis />}
                     />
                     <Route
                         path="/internal"
