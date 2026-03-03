@@ -12,8 +12,24 @@ function formatDate(iso) {
     return `${dd}.${mm}.${yyyy} ${hh}:${min}`;
 }
 
+function accountLabel(acc) {
+    if (acc.medium === "card") {
+        const last4 = acc.details?.card_last_four || "????";
+        const provider = acc.details?.card_provider || "";
+        return `${provider} **** ${last4}`.trim();
+    }
+    return acc.metadata?.name || acc.urn;
+}
+
+function formatBalance(balance) {
+    if (!balance) return null;
+    return Object.entries(balance)
+        .map(([asset, b]) => `${b.current} ${asset}`)
+        .join(", ");
+}
+
 const CardTransactions = () => {
-    const [cards, setCards] = useState([]);
+    const [accounts, setAccounts] = useState([]);
     const [selectedUrn, setSelectedUrn] = useState(null);
     const [movements, setMovements] = useState([]);
     const [nextToken, setNextToken] = useState(null);
@@ -23,36 +39,35 @@ const CardTransactions = () => {
     const [noCredentials, setNoCredentials] = useState(false);
 
     useEffect(() => {
-        const fetchCards = async () => {
+        const fetchAccounts = async () => {
             setLoading(true);
             setError(null);
             try {
-                const res = await apiGet("bloque/cards");
+                const res = await apiGet("bloque/accounts");
                 if (res.status === 404) {
                     setNoCredentials(true);
                     return;
                 }
-                if (!res.ok) throw new Error("Failed to fetch cards");
+                if (!res.ok) throw new Error("Failed to fetch accounts");
                 const data = await res.json();
-                const cardList = data.accounts || data;
-                setCards(Array.isArray(cardList) ? cardList : []);
-                if (Array.isArray(cardList) && cardList.length > 0) {
-                    setSelectedUrn(cardList[0].urn);
-                }
+                const list = data.accounts || data;
+                const arr = Array.isArray(list) ? list : [];
+                setAccounts(arr);
+                if (arr.length > 0) setSelectedUrn(arr[0].urn);
             } catch (e) {
                 console.error(e);
-                setError("Failed to load card data.");
+                setError("Failed to load account data.");
             } finally {
                 setLoading(false);
             }
         };
-        fetchCards();
+        fetchAccounts();
     }, []);
 
     const fetchMovements = useCallback(async (urn, token) => {
         const params = token ? `?next=${encodeURIComponent(token)}` : "";
         const res = await apiGet(
-            `bloque/cards/${encodeURIComponent(urn)}/movements${params}`
+            `bloque/accounts/${encodeURIComponent(urn)}/movements${params}`
         );
         if (!res.ok) throw new Error("Failed to fetch movements");
         return res.json();
@@ -93,18 +108,21 @@ const CardTransactions = () => {
 
     if (noCredentials) {
         return (
-            <p>No debit card linked. Contact admin to set up your card access.</p>
+            <p>No Bloque account linked. Contact admin to set up your access.</p>
         );
     }
 
     if (loading && movements.length === 0) return <Spinner />;
     if (error) return <p className="has-text-danger">{error}</p>;
+    if (!loading && accounts.length === 0) {
+        return <p>No Bloque accounts found.</p>;
+    }
 
-    const selectedCard = cards.find((c) => c.urn === selectedUrn);
+    const selected = accounts.find((a) => a.urn === selectedUrn);
 
     return (
         <>
-            {cards.length > 1 && (
+            {accounts.length > 1 && (
                 <div className="field">
                     <div className="control">
                         <div className="select">
@@ -112,10 +130,9 @@ const CardTransactions = () => {
                                 value={selectedUrn || ""}
                                 onChange={(e) => setSelectedUrn(e.target.value)}
                             >
-                                {cards.map((c) => (
-                                    <option key={c.urn} value={c.urn}>
-                                        **** {c.lastFour || c.last_four || "????"} -{" "}
-                                        {c.status}
+                                {accounts.map((a) => (
+                                    <option key={a.urn} value={a.urn}>
+                                        [{a.medium}] {accountLabel(a)} - {a.status}
                                     </option>
                                 ))}
                             </select>
@@ -124,25 +141,37 @@ const CardTransactions = () => {
                 </div>
             )}
 
-            {selectedCard && (
+            {selected && (
                 <div className="box" style={{ marginBottom: "1rem" }}>
                     <p>
-                        <strong>Card:</strong> **** {selectedCard.lastFour || selectedCard.last_four || "????"}
+                        <strong>Account:</strong> {accountLabel(selected)}
                     </p>
                     <p>
-                        <strong>Type:</strong> {selectedCard.medium || "card"} / {selectedCard.productType || selectedCard.product_type || "debit"}
+                        <strong>Medium:</strong> {selected.medium}
                     </p>
-                    <p>
-                        <strong>Status:</strong> {selectedCard.status}
-                    </p>
-                    {(selectedCard.balance != null) && (
+                    {selected.medium === "card" && (
+                        <>
+                            <p>
+                                <strong>Card type:</strong> {selected.details?.card_type || "VIRTUAL"} / {selected.details?.card_product_type || "CREDIT"}
+                            </p>
+                            <p>
+                                <strong>Card status:</strong> {selected.details?.card_status || selected.status}
+                            </p>
+                        </>
+                    )}
+                    {selected.medium === "virtual" && (
                         <p>
-                            <strong>Balance:</strong> {selectedCard.balance} {selectedCard.asset || "DUSD"}
+                            <strong>Status:</strong> {selected.status}
                         </p>
                     )}
-                    {selectedCard.detailsUrl && (
+                    {selected.balance && (
                         <p>
-                            <a href={selectedCard.detailsUrl} target="_blank" rel="noreferrer">
+                            <strong>Balance:</strong> {formatBalance(selected.balance)}
+                        </p>
+                    )}
+                    {selected.details?.card_url_details && (
+                        <p>
+                            <a href={selected.details.card_url_details} target="_blank" rel="noreferrer">
                                 View full card details
                             </a>
                         </p>
@@ -151,7 +180,7 @@ const CardTransactions = () => {
             )}
 
             {movements.length === 0 && !loading && (
-                <p>No movements found for this card.</p>
+                <p>No movements found for this account.</p>
             )}
 
             {movements.length > 0 && (
