@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState, useCallback } from "react";
 import PublicInternalLayout from "./PublicInternalLayout";
 import Spinner from "./Spinner";
+import CardTransactions from "./CardTransactions";
 import { apiGet } from "../api";
 import { MeContext } from "../App";
 
@@ -85,6 +86,7 @@ async function fetchAllTransactions(address, start, end) {
 
 const TransactionHistory = () => {
     const { me } = useContext(MeContext);
+    const [activeTab, setActiveTab] = useState("onchain");
     const [transactions, setTransactions] = useState([]);
     const [showSpinner, setShowSpinner] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -155,58 +157,73 @@ const TransactionHistory = () => {
     return (
         <PublicInternalLayout>
             <p className="title is-4">Transaction History</p>
-            {showSpinner && <Spinner />}
-            {error && <p className="has-text-danger">{error}</p>}
-            {!showSpinner && !error && transactions.length === 0 && me.address && (
-                <p>No transactions found in the last year.</p>
-            )}
-            {transactions.length > 0 && (
+            <div className="tabs">
+                <ul>
+                    <li className={activeTab === "onchain" ? "is-active" : ""}>
+                        <a onClick={() => setActiveTab("onchain")}>On-chain Transactions</a>
+                    </li>
+                    <li className={activeTab === "card" ? "is-active" : ""}>
+                        <a onClick={() => setActiveTab("card")}>Card Transactions</a>
+                    </li>
+                </ul>
+            </div>
+            {activeTab === "onchain" && (
                 <>
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Type</th>
-                                <th>Counterparty</th>
-                                <th>Amount</th>
-                                <th>Currency</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {expandSwaps(transactions).map((tx, i) => {
-                                const amount = parseFloat(tx.displayAmount ?? tx.amount);
-                                const currency = tx.displayCurrency ?? tx.currency;
-                                const type = tx.displayType ?? deriveType(tx);
-                                return (
-                                    <tr key={i}>
-                                        <td>{formatDate(tx.timestamp)}</td>
-                                        <td>{type}</td>
-                                        <td>{tx.counterParty}</td>
-                                        <td
-                                            style={{
-                                                color: amount >= 0 ? "green" : "red",
-                                            }}
-                                        >
-                                            {amount >= 0 ? "+" : ""}
-                                            {amount.toFixed(2)}
-                                        </td>
-                                        <td>{currency}</td>
+                    {showSpinner && <Spinner />}
+                    {error && <p className="has-text-danger">{error}</p>}
+                    {!showSpinner && !error && transactions.length === 0 && me.address && (
+                        <p>No transactions found in the last year.</p>
+                    )}
+                    {transactions.length > 0 && (
+                        <>
+                            <table className="table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Counterparty</th>
+                                        <th>Amount</th>
+                                        <th>Currency</th>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                    {hasMore && (
-                        <button
-                            className="button is-link"
-                            onClick={handleLoadMore}
-                            disabled={loadingMore}
-                        >
-                            {loadingMore ? "Loading..." : "Load earlier transactions"}
-                        </button>
+                                </thead>
+                                <tbody>
+                                    {expandSwaps(transactions).map((tx, i) => {
+                                        const amount = parseFloat(tx.displayAmount ?? tx.amount);
+                                        const currency = tx.displayCurrency ?? tx.currency;
+                                        const type = tx.displayType ?? deriveType(tx);
+                                        return (
+                                            <tr key={i}>
+                                                <td>{formatDate(tx.timestamp)}</td>
+                                                <td>{type}</td>
+                                                <td>{tx.counterParty}</td>
+                                                <td
+                                                    style={{
+                                                        color: amount >= 0 ? "green" : "red",
+                                                    }}
+                                                >
+                                                    {amount >= 0 ? "+" : ""}
+                                                    {amount.toFixed(2)}
+                                                </td>
+                                                <td>{currency}</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                            {hasMore && (
+                                <button
+                                    className="button is-link"
+                                    onClick={handleLoadMore}
+                                    disabled={loadingMore}
+                                >
+                                    {loadingMore ? "Loading..." : "Load earlier transactions"}
+                                </button>
+                            )}
+                        </>
                     )}
                 </>
             )}
+            {activeTab === "card" && <CardTransactions />}
         </PublicInternalLayout>
     );
 };
