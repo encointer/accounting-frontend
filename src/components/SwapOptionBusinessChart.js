@@ -8,6 +8,7 @@ Chart.register(...registerables);
 const inlineLegendPlugin = {
     id: "inlineLegend",
     afterDraw(chart) {
+        if (!chart.scales.x) return;
         const meta0 = chart.getDatasetMeta(0);
         if (!meta0 || !meta0.data.length) return;
 
