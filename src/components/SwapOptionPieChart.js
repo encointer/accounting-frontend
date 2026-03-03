@@ -65,51 +65,76 @@ const centerTextPlugin = {
 
 Chart.register(dashedArcPlugin, centerTextPlugin);
 
-const COLORS = [
-    "rgba(72, 199, 142, 0.8)",  // green - enacted
-    "rgba(62, 142, 208, 0.8)",  // blue - approved
-    "rgba(255, 183, 77, 0.8)",  // orange - additional options
-    "rgba(156, 109, 217, 0.8)", // purple
-    "rgba(240, 240, 240, 0.6)", // light grey - free balance
+const ENACTED_COLORS = [
+    "rgba(72, 199, 142, 0.8)",  // green
+    "rgba(38, 166, 112, 0.8)",
+    "rgba(100, 210, 160, 0.8)",
+    "rgba(50, 180, 130, 0.8)",
 ];
+
+const APPROVED_COLORS = [
+    "rgba(62, 142, 208, 0.8)",  // blue
+    "rgba(90, 160, 220, 0.8)",
+    "rgba(40, 120, 190, 0.8)",
+    "rgba(110, 175, 230, 0.8)",
+];
+
+const FREE_COLOR = "rgba(240, 240, 240, 0.6)";
 
 const SwapOptionPieChart = ({ currentBalance, activeOptions, proposals, assetLabel }) => {
     const chartData = useMemo(() => {
-        const enactedApproved = activeOptions.reduce(
+        // Active on-chain options (enacted, remaining allowance)
+        const enactedTotal = activeOptions.reduce(
             (sum, o) => sum + (o.remainingAllowance || 0), 0
         );
 
-        // Proposed = Ongoing + Confirming proposals (not yet enacted)
-        const proposedOptions = proposals.filter(
-            (p) => p.state === "Ongoing" || p.state === "Confirming"
-        );
-        const proposedTotal = proposedOptions.reduce(
+        // Approved proposals (not yet enacted — will become options at next enactment)
+        const approvedProposals = proposals.filter((p) => p.state === "Approved");
+        const approvedTotal = approvedProposals.reduce(
             (sum, p) => sum + (p.allowance || 0), 0
         );
 
-        const freeBalance = Math.max(0, currentBalance - enactedApproved);
-        const isOverclaiming = enactedApproved + proposedTotal > currentBalance;
+        // Proposed = Ongoing + Confirming (dashed arc, not a solid slice)
+        const proposedProposals = proposals.filter(
+            (p) => p.state === "Ongoing" || p.state === "Confirming"
+        );
+        const proposedTotal = proposedProposals.reduce(
+            (sum, p) => sum + (p.allowance || 0), 0
+        );
+
+        const committed = enactedTotal + approvedTotal;
+        const freeBalance = Math.max(0, currentBalance - committed);
+        const isOverclaiming = committed + proposedTotal > currentBalance;
         const proposedFraction = currentBalance > 0
             ? proposedTotal / currentBalance
             : 0;
 
-        // Build slices: one per active option + free balance
+        // Build slices: enacted options + approved proposals + free balance
         const labels = [];
         const data = [];
         const colors = [];
 
         activeOptions.forEach((opt, i) => {
             const label = opt.beneficiary
-                ? `${opt.beneficiary.slice(0, 8)}...`
-                : `Option ${i + 1}`;
+                ? `Active: ${opt.beneficiary.slice(0, 8)}...`
+                : `Active option ${i + 1}`;
             labels.push(label);
             data.push(opt.remainingAllowance || 0);
-            colors.push(COLORS[i % (COLORS.length - 1)]);
+            colors.push(ENACTED_COLORS[i % ENACTED_COLORS.length]);
+        });
+
+        approvedProposals.forEach((p, i) => {
+            const label = p.beneficiary
+                ? `Approved: ${p.beneficiary.slice(0, 8)}...`
+                : `Approved #${p.id}`;
+            labels.push(label);
+            data.push(p.allowance || 0);
+            colors.push(APPROVED_COLORS[i % APPROVED_COLORS.length]);
         });
 
         labels.push("Free");
         data.push(freeBalance);
-        colors.push(COLORS[COLORS.length - 1]);
+        colors.push(FREE_COLOR);
 
         return {
             chartData: {
