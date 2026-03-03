@@ -34,6 +34,7 @@ function primaryAsset(account) {
 }
 
 const CardTransactions = () => {
+    const [identity, setIdentity] = useState(null);
     const [accounts, setAccounts] = useState([]);
     const [selectedUrn, setSelectedUrn] = useState(null);
     const [movements, setMovements] = useState([]);
@@ -44,21 +45,25 @@ const CardTransactions = () => {
     const [noCredentials, setNoCredentials] = useState(false);
 
     useEffect(() => {
-        const fetchAccounts = async () => {
+        const fetchData = async () => {
             setLoading(true);
             setError(null);
             try {
-                const res = await apiGet("bloque/accounts");
-                if (res.status === 404) {
+                const [accountsRes, identityRes] = await Promise.all([
+                    apiGet("bloque/accounts"),
+                    apiGet("bloque/identity"),
+                ]);
+                if (accountsRes.status === 404) {
                     setNoCredentials(true);
                     return;
                 }
-                if (!res.ok) throw new Error("Failed to fetch accounts");
-                const data = await res.json();
+                if (!accountsRes.ok) throw new Error("Failed to fetch accounts");
+                const data = await accountsRes.json();
                 const list = data.accounts || data;
                 const arr = Array.isArray(list) ? list : [];
                 setAccounts(arr);
                 if (arr.length > 0) setSelectedUrn(arr[0].urn);
+                if (identityRes.ok) setIdentity(await identityRes.json());
             } catch (e) {
                 console.error(e);
                 setError("Failed to load account data.");
@@ -66,7 +71,7 @@ const CardTransactions = () => {
                 setLoading(false);
             }
         };
-        fetchAccounts();
+        fetchData();
     }, []);
 
     const fetchMovements = useCallback(async (urn, asset, token) => {
@@ -137,6 +142,23 @@ const CardTransactions = () => {
 
     return (
         <>
+            {identity?.profile && (
+                <div className="box" style={{ marginBottom: "1rem" }}>
+                    <p className="has-text-weight-bold">
+                        {identity.profile.first_name} {identity.profile.last_name}
+                    </p>
+                    <p>{identity.profile.email}</p>
+                    <p>
+                        {identity.profile.city}
+                        {identity.profile.postal_code && `, ${identity.profile.postal_code}`}
+                        {identity.profile.state && ` ${identity.profile.state}`}
+                        {identity.profile.country_of_residence_code && ` (${identity.profile.country_of_residence_code})`}
+                    </p>
+                    <p>
+                        <small>Status: {identity.status}</small>
+                    </p>
+                </div>
+            )}
             {accounts.length > 1 && (
                 <div className="field">
                     <div className="control">
