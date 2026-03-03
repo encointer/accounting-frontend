@@ -81,7 +81,13 @@ const APPROVED_COLORS = [
 
 const FREE_COLOR = "rgba(240, 240, 240, 0.6)";
 
-const SwapOptionPieChart = ({ currentBalance, activeOptions, proposals, assetLabel }) => {
+const fmtBalance = (v) => {
+    if (v === 0) return "0";
+    if (v >= 100) return Math.round(v).toString();
+    return Number(v).toPrecision(4).replace(/\.?0+$/, "");
+};
+
+const SwapOptionPieChart = ({ currentBalance, activeOptions, proposals, assetLabel, nameMap = {} }) => {
     const chartData = useMemo(() => {
         // Active on-chain options (enacted, remaining allowance)
         const enactedTotal = activeOptions.reduce(
@@ -114,11 +120,16 @@ const SwapOptionPieChart = ({ currentBalance, activeOptions, proposals, assetLab
         const data = [];
         const colors = [];
 
+        const dn = (addr) => {
+            if (!addr) return null;
+            return nameMap[addr] || addr.slice(0, 8) + "...";
+        };
+
         [...activeOptions]
             .sort((a, b) => (b.remainingAllowance || 0) - (a.remainingAllowance || 0))
             .forEach((opt, i) => {
                 const label = opt.beneficiary
-                    ? `Active: ${opt.beneficiary.slice(0, 8)}...`
+                    ? `Active: ${dn(opt.beneficiary)}`
                     : `Active option ${i + 1}`;
                 labels.push(label);
                 data.push(opt.remainingAllowance || 0);
@@ -129,7 +140,7 @@ const SwapOptionPieChart = ({ currentBalance, activeOptions, proposals, assetLab
             .sort((a, b) => (b.allowance || 0) - (a.allowance || 0))
             .forEach((p, i) => {
             const label = p.beneficiary
-                ? `Approved: ${p.beneficiary.slice(0, 8)}...`
+                ? `Approved: ${dn(p.beneficiary)}`
                 : `Approved #${p.id}`;
             labels.push(label);
             data.push(p.allowance || 0);
@@ -154,7 +165,7 @@ const SwapOptionPieChart = ({ currentBalance, activeOptions, proposals, assetLab
             isOverclaiming,
             proposedTotal,
         };
-    }, [currentBalance, activeOptions, proposals]);
+    }, [currentBalance, activeOptions, proposals, nameMap]);
 
     const options = {
         cutout: "55%",
@@ -170,7 +181,7 @@ const SwapOptionPieChart = ({ currentBalance, activeOptions, proposals, assetLab
                 },
             },
             centerText: {
-                text: `${currentBalance.toFixed(4)} ${assetLabel}`,
+                text: `${fmtBalance(currentBalance)} ${assetLabel}`,
             },
             dashedArc: {
                 proposedFraction: chartData.proposedFraction,

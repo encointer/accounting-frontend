@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { apiGet } from "../api";
 import PublicLayout from "./PublicLayout";
 import Spinner from "./Spinner";
@@ -47,6 +47,30 @@ const SwapOptionAnalysis = () => {
     const assetData = tab === "native" ? data?.native : data?.asset;
     const assetLabel = tab === "native" ? "KSM" : (data?.asset?.assetName || "USDC");
 
+    // Build address → display name lookup from businesses
+    const nameMap = useMemo(() => {
+        const m = {};
+        if (data?.businesses) {
+            for (const b of data.businesses) {
+                m[b.address] = b.name
+                    ? `${b.name} (${b.address.slice(0, 4)})`
+                    : b.address.slice(0, 8) + "...";
+            }
+        }
+        return m;
+    }, [data]);
+
+    const displayName = (addr) => {
+        if (!addr) return "?";
+        return nameMap[addr] || addr.slice(0, 8) + "...";
+    };
+
+    const fmtSig = (v, n = 4) => {
+        if (v == null) return "-";
+        if (v === 0) return "0";
+        return Number(v).toPrecision(n).replace(/\.?0+$/, "");
+    };
+
     return (
         <PublicLayout>
             <h2 className="title is-4">Swap Option Analysis</h2>
@@ -88,6 +112,7 @@ const SwapOptionAnalysis = () => {
                                     activeOptions={assetData?.activeOptions || []}
                                     proposals={assetData?.proposals || []}
                                     assetLabel={assetLabel}
+                                    nameMap={nameMap}
                                 />
                             </div>
                         </div>
@@ -125,10 +150,10 @@ const SwapOptionAnalysis = () => {
                                                 {assetData.activeOptions.map((opt, i) => (
                                                     <tr key={i}>
                                                         <td title={opt.beneficiary}>
-                                                            {opt.beneficiary ? opt.beneficiary.slice(0, 8) + "..." : "?"}
+                                                            {displayName(opt.beneficiary)}
                                                         </td>
                                                         <td>{opt.remainingAllowance != null ? opt.remainingAllowance.toFixed(4) : "?"} {assetLabel}</td>
-                                                        <td>{opt.rate != null ? opt.rate : "?"}</td>
+                                                        <td>{opt.rate != null ? fmtSig(opt.rate) : "?"}</td>
                                                         <td>{opt.doBurn != null ? (opt.doBurn ? "Yes" : "No") : "?"}</td>
                                                         <td>{opt.validUntil ? new Date(opt.validUntil).toLocaleDateString() : "None"}</td>
                                                     </tr>
@@ -164,10 +189,10 @@ const SwapOptionAnalysis = () => {
                                                             p.state === "Confirming" ? "warning" : "light"
                                                         }`}>{p.state}</span></td>
                                                         <td title={p.beneficiary}>
-                                                            {p.beneficiary ? p.beneficiary.slice(0, 8) + "..." : "-"}
+                                                            {displayName(p.beneficiary)}
                                                         </td>
                                                         <td>{p.allowance != null ? p.allowance.toFixed(4) : "-"} {assetLabel}</td>
-                                                        <td>{p.rate != null ? p.rate : "-"}</td>
+                                                        <td>{p.rate != null ? fmtSig(p.rate) : "-"}</td>
                                                         <td>{p.passing ? <span className="tag is-success is-light">Pass</span> : <span className="tag is-danger is-light">Fail</span>}</td>
                                                     </tr>
                                                 ))}
