@@ -4,6 +4,7 @@ import PublicLayout from "./PublicLayout";
 import Spinner from "./Spinner";
 import SwapOptionPieChart from "./SwapOptionPieChart";
 import SwapOptionTimeline from "./SwapOptionTimeline";
+import SwapOptionBusinessChart from "./SwapOptionBusinessChart";
 
 const TREASURIES = [
     { cid: "u0qj944rhWE", name: "Leu" },
@@ -175,6 +176,17 @@ const SwapOptionAnalysis = () => {
                                     </div>
                                 </>
                             )}
+                        </div>
+                    )}
+
+                    {data.businesses && data.businesses.length > 0 && (
+                        <div className="mt-5">
+                            <h3 className="title is-5">Per-Business Analysis ({assetLabel})</h3>
+                            <SwapOptionBusinessChart
+                                businesses={data.businesses}
+                                assetLabel={assetLabel}
+                                assetKey={tab === "native" ? "native" : "asset"}
+                            />
                         </div>
                     )}
                 </>
