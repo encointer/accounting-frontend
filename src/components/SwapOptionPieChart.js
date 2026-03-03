@@ -114,16 +114,20 @@ const SwapOptionPieChart = ({ currentBalance, activeOptions, proposals, assetLab
         const data = [];
         const colors = [];
 
-        activeOptions.forEach((opt, i) => {
-            const label = opt.beneficiary
-                ? `Active: ${opt.beneficiary.slice(0, 8)}...`
-                : `Active option ${i + 1}`;
-            labels.push(label);
-            data.push(opt.remainingAllowance || 0);
-            colors.push(ENACTED_COLORS[i % ENACTED_COLORS.length]);
-        });
+        [...activeOptions]
+            .sort((a, b) => (b.remainingAllowance || 0) - (a.remainingAllowance || 0))
+            .forEach((opt, i) => {
+                const label = opt.beneficiary
+                    ? `Active: ${opt.beneficiary.slice(0, 8)}...`
+                    : `Active option ${i + 1}`;
+                labels.push(label);
+                data.push(opt.remainingAllowance || 0);
+                colors.push(ENACTED_COLORS[i % ENACTED_COLORS.length]);
+            });
 
-        approvedProposals.forEach((p, i) => {
+        [...approvedProposals]
+            .sort((a, b) => (b.allowance || 0) - (a.allowance || 0))
+            .forEach((p, i) => {
             const label = p.beneficiary
                 ? `Approved: ${p.beneficiary.slice(0, 8)}...`
                 : `Approved #${p.id}`;
