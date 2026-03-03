@@ -13,11 +13,11 @@ const TREASURIES = [
 ];
 
 const SwapOptionAnalysis = () => {
-    const [cid, setCid] = useState(TREASURIES[0].cid);
+    const [cid, setCid] = useState(TREASURIES[1].cid);
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [tab, setTab] = useState("native");
+    const [tab, setTab] = useState("asset");
 
     useEffect(() => {
         let cancelled = false;

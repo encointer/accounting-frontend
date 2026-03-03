@@ -4,7 +4,7 @@ import { Chart, registerables } from "chart.js";
 
 Chart.register(...registerables);
 
-// Plugin: draw inline legend labels to the right of each bar group
+// Plugin: draw inline stack labels to the right of each bar group for every row
 const inlineLegendPlugin = {
     id: "inlineLegend",
     afterDraw(chart) {
@@ -13,7 +13,7 @@ const inlineLegendPlugin = {
         if (!meta0 || !meta0.data.length) return;
 
         const ctx = chart.ctx;
-        // Collect actual y position and max x per stack per data index
+        // Collect max x and y per stack per data index
         const stackBars = {};
         chart.data.datasets.forEach((ds, di) => {
             const meta = chart.getDatasetMeta(di);
@@ -23,20 +23,21 @@ const inlineLegendPlugin = {
             meta.data.forEach((bar, i) => {
                 if (!stackBars[stack].rows[i]) stackBars[stack].rows[i] = { x: 0, y: bar.y };
                 if (bar.x > stackBars[stack].rows[i].x) stackBars[stack].rows[i].x = bar.x;
-                stackBars[stack].rows[i].y = bar.y; // all bars in same stack/index share y
+                stackBars[stack].rows[i].y = bar.y;
             });
         });
 
         ctx.save();
         ctx.font = "9px Poppins, sans-serif";
         ctx.textBaseline = "middle";
-        ctx.fillStyle = "#666";
+        ctx.fillStyle = "#999";
+        const xLeft = chart.scales.x.left;
 
-        // Draw label at end of each stack for first data index only
         for (const [, info] of Object.entries(stackBars)) {
-            const row = info.rows[0];
-            if (!row || row.x <= chart.scales.x.left + 2) continue;
-            ctx.fillText(info.label, row.x + 4, row.y);
+            for (const [, row] of Object.entries(info.rows)) {
+                if (!row || row.x <= xLeft + 2) continue;
+                ctx.fillText(info.label, row.x + 4, row.y);
+            }
         }
         ctx.restore();
     },
@@ -48,13 +49,12 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
     const { data, options } = useMemo(() => {
         if (!businesses || businesses.length === 0) return { data: null, options: null };
 
-        // Sort by total swap option value (exercised+active+approved+proposed) descending
         const sorted = [...businesses]
             .map((b) => {
                 const s = b.swapOptions[assetKey];
                 return { ...b, totalSwap: s.exercised + s.active + s.approved + s.proposed };
             })
-            .filter((b) => b.totalSwap > 0 || (b.ccInfluxCurrentMonth || 0) + (b.ccInflux3m || 0) + (b.ccInfluxOlder || 0) > 0)
+            .filter((b) => b.totalSwap > 0 || (b.ccInfluxCurrentMonth || 0) + (b.ccInflux3m || 0) + (b.ccInfluxOlder || 0) + (b.ccCeremonyIssuance || 0) > 0)
             .sort((a, b) => b.totalSwap - a.totalSwap);
 
         if (sorted.length === 0) return { data: null, options: null };
@@ -112,7 +112,14 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
             {
                 label: "CC influx (older)",
                 data: sorted.map((b) => b.ccInfluxOlder || 0),
-                backgroundColor: "rgba(232, 143, 107, 0.3)",
+                backgroundColor: "rgba(200, 200, 200, 0.5)",
+                stack: "ccInflux",
+                stackLabel: "CC influx",
+            },
+            {
+                label: "Ceremony issuance (all-time)",
+                data: sorted.map((b) => b.ccCeremonyIssuance || 0),
+                backgroundColor: "rgba(180, 180, 180, 0.4)",
                 stack: "ccInflux",
                 stackLabel: "CC influx",
             },
@@ -153,7 +160,7 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
                 responsive: true,
                 maintainAspectRatio: false,
                 layout: {
-                    padding: { right: 80 },
+                    padding: { right: 70 },
                 },
                 scales: {
                     x: {
@@ -189,7 +196,7 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
     const height = Math.max(200, data.labels.length * 80);
 
     return (
-        <div style={{ height: `${height}px` }}>
+        <div style={{ height: `${height}px`, maxWidth: "100%", overflow: "hidden" }}>
             <Bar data={data} options={options} />
         </div>
     );
