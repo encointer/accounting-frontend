@@ -28,6 +28,11 @@ function formatBalance(balance) {
         .join(", ");
 }
 
+function primaryAsset(account) {
+    if (!account?.balance) return null;
+    return Object.keys(account.balance)[0] || null;
+}
+
 const CardTransactions = () => {
     const [accounts, setAccounts] = useState([]);
     const [selectedUrn, setSelectedUrn] = useState(null);
@@ -64,10 +69,11 @@ const CardTransactions = () => {
         fetchAccounts();
     }, []);
 
-    const fetchMovements = useCallback(async (urn, token) => {
-        const params = token ? `?next=${encodeURIComponent(token)}` : "";
+    const fetchMovements = useCallback(async (urn, asset, token) => {
+        const params = new URLSearchParams({ asset });
+        if (token) params.set("next", token);
         const res = await apiGet(
-            `bloque/accounts/${encodeURIComponent(urn)}/movements${params}`
+            `bloque/accounts/${encodeURIComponent(urn)}/movements?${params}`
         );
         if (!res.ok) throw new Error("Failed to fetch movements");
         return res.json();
@@ -75,13 +81,20 @@ const CardTransactions = () => {
 
     useEffect(() => {
         if (!selectedUrn) return;
+        const selected = accounts.find((a) => a.urn === selectedUrn);
+        const asset = primaryAsset(selected);
+        if (!asset) {
+            setMovements([]);
+            setLoading(false);
+            return;
+        }
         const load = async () => {
             setLoading(true);
             setError(null);
             try {
-                const data = await fetchMovements(selectedUrn, null);
-                setMovements(data.movements || []);
-                setNextToken(data.next || null);
+                const data = await fetchMovements(selectedUrn, asset, null);
+                setMovements(data.data || data.movements || []);
+                setNextToken(data.has_more ? data.next : null);
             } catch (e) {
                 console.error(e);
                 setError("Failed to load movements.");
@@ -90,14 +103,16 @@ const CardTransactions = () => {
             }
         };
         load();
-    }, [selectedUrn, fetchMovements]);
+    }, [selectedUrn, accounts, fetchMovements]);
 
     const handleLoadMore = async () => {
+        const selected = accounts.find((a) => a.urn === selectedUrn);
+        const asset = primaryAsset(selected);
         setLoadingMore(true);
         try {
-            const data = await fetchMovements(selectedUrn, nextToken);
-            setMovements((prev) => [...prev, ...(data.movements || [])]);
-            setNextToken(data.next || null);
+            const data = await fetchMovements(selectedUrn, asset, nextToken);
+            setMovements((prev) => [...prev, ...(data.data || data.movements || [])]);
+            setNextToken(data.has_more ? data.next : null);
         } catch (e) {
             console.error(e);
             setError("Failed to load more movements.");
