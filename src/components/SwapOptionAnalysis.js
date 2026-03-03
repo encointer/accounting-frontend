@@ -7,9 +7,9 @@ import SwapOptionTimeline from "./SwapOptionTimeline";
 import SwapOptionBusinessChart from "./SwapOptionBusinessChart";
 
 const TREASURIES = [
-    { cid: "u0qj944rhWE", name: "Leu" },
-    { cid: "kygch5kVGq7", name: "Nyota" },
-    { cid: "s1vrqQL2SD", name: "PayNuQ" },
+    { cid: "u0qj944rhWE", name: "Leu", ccSymbol: "LEU" },
+    { cid: "kygch5kVGq7", name: "Nyota", ccSymbol: "NYT" },
+    { cid: "s1vrqQL2SD", name: "PayNuQ", ccSymbol: "NUQ" },
 ];
 
 const SwapOptionAnalysis = () => {
@@ -46,6 +46,7 @@ const SwapOptionAnalysis = () => {
 
     const assetData = tab === "native" ? data?.native : data?.asset;
     const assetLabel = tab === "native" ? "KSM" : (data?.asset?.assetName || "USDC");
+    const ccSymbol = TREASURIES.find((t) => t.cid === cid)?.ccSymbol || "CC";
 
     // Build address → display name lookup from businesses
     const nameMap = useMemo(() => {
@@ -211,6 +212,7 @@ const SwapOptionAnalysis = () => {
                                 businesses={data.businesses}
                                 assetLabel={assetLabel}
                                 assetKey={tab === "native" ? "native" : "asset"}
+                                ccSymbol={ccSymbol}
                             />
                         </div>
                     )}

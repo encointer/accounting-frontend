@@ -44,7 +44,7 @@ const inlineLegendPlugin = {
     },
 };
 
-const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
+const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey, ccSymbol = "CC" }) => {
     const chartRef = useRef(null);
 
     const { data, options } = useMemo(() => {
@@ -97,63 +97,63 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
                 stack: "swap",
                 stackLabel: "Swap",
             },
-            // CC influx stack: transfers by recency, then ceremony issuance on top
+            // Income stack: transfers by recency, then ceremony issuance on top
             {
-                label: "CC influx (this month)",
+                label: `${ccSymbol} income (this month)`,
                 data: sorted.map((b) => b.ccInfluxCurrentMonth || 0),
                 backgroundColor: "rgba(232, 143, 107, 0.9)",
-                stack: "ccInflux",
-                stackLabel: "CC influx",
+                stack: "ccIncome",
+                stackLabel: `${ccSymbol} income`,
             },
             {
-                label: "CC influx (last 3 months)",
+                label: `${ccSymbol} income (last 3 months)`,
                 data: sorted.map((b) => b.ccInflux3m || 0),
                 backgroundColor: "rgba(232, 143, 107, 0.6)",
-                stack: "ccInflux",
-                stackLabel: "CC influx",
+                stack: "ccIncome",
+                stackLabel: `${ccSymbol} income`,
             },
             {
-                label: "CC influx (older)",
+                label: `${ccSymbol} income (older)`,
                 data: sorted.map((b) => b.ccInfluxOlder || 0),
                 backgroundColor: "rgba(160, 140, 130, 0.6)",
-                stack: "ccInflux",
-                stackLabel: "CC influx",
+                stack: "ccIncome",
+                stackLabel: `${ccSymbol} income`,
             },
             {
-                label: "Ceremony issuance (all-time)",
+                label: `${ccSymbol} issuance (all-time)`,
                 data: sorted.map((b) => b.ccCeremonyIssuance || 0),
                 backgroundColor: "rgba(210, 210, 210, 0.5)",
-                stack: "ccInflux",
-                stackLabel: "CC influx",
+                stack: "ccIncome",
+                stackLabel: `${ccSymbol} income`,
             },
-            // CC outflow stack: non-circular first, then 4+, 3, 2 (big cycles → small)
+            // Outflow stack: non-circular first, then 4+, 3, 2 (big cycles → small)
             {
-                label: "CC outflow: non-circular",
+                label: `${ccSymbol} outflow: non-circular`,
                 data: sorted.map((b) => b.ccOutflow.outflowNonCircular),
                 backgroundColor: "rgba(255, 230, 130, 0.6)",
                 stack: "circ",
-                stackLabel: "CC outflow",
+                stackLabel: `${ccSymbol} outflow`,
             },
             {
-                label: "CC outflow: 4+-cycle",
+                label: `${ccSymbol} outflow: 4+-cycle`,
                 data: sorted.map((b) => b.ccOutflow.outflow4plus),
                 backgroundColor: "rgba(220, 120, 0, 0.7)",
                 stack: "circ",
-                stackLabel: "CC outflow",
+                stackLabel: `${ccSymbol} outflow`,
             },
             {
-                label: "CC outflow: 3-cycle",
+                label: `${ccSymbol} outflow: 3-cycle`,
                 data: sorted.map((b) => b.ccOutflow.outflow3),
                 backgroundColor: "rgba(255, 165, 0, 0.7)",
                 stack: "circ",
-                stackLabel: "CC outflow",
+                stackLabel: `${ccSymbol} outflow`,
             },
             {
-                label: "CC outflow: 2-cycle",
+                label: `${ccSymbol} outflow: 2-cycle`,
                 data: sorted.map((b) => b.ccOutflow.outflow2),
                 backgroundColor: "rgba(255, 215, 0, 0.7)",
                 stack: "circ",
-                stackLabel: "CC outflow",
+                stackLabel: `${ccSymbol} outflow`,
             },
         ];
 
@@ -192,7 +192,7 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
                 },
             },
         };
-    }, [businesses, assetLabel, assetKey]);
+    }, [businesses, assetLabel, assetKey, ccSymbol]);
 
     if (!data) {
         return <p className="has-text-grey is-size-7">No business data available.</p>;
