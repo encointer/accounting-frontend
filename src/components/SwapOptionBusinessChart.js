@@ -4,6 +4,45 @@ import { Chart, registerables } from "chart.js";
 
 Chart.register(...registerables);
 
+// Plugin: draw inline legend labels to the right of each bar group
+const inlineLegendPlugin = {
+    id: "inlineLegend",
+    afterDraw(chart) {
+        const meta0 = chart.getDatasetMeta(0);
+        if (!meta0 || !meta0.data.length) return;
+
+        const ctx = chart.ctx;
+        // Collect actual y position and max x per stack per data index
+        const stackBars = {};
+        chart.data.datasets.forEach((ds, di) => {
+            const meta = chart.getDatasetMeta(di);
+            if (meta.hidden) return;
+            const stack = ds.stack;
+            if (!stackBars[stack]) stackBars[stack] = { label: ds.stackLabel || stack, rows: {} };
+            meta.data.forEach((bar, i) => {
+                if (!stackBars[stack].rows[i]) stackBars[stack].rows[i] = { x: 0, y: bar.y };
+                if (bar.x > stackBars[stack].rows[i].x) stackBars[stack].rows[i].x = bar.x;
+                stackBars[stack].rows[i].y = bar.y; // all bars in same stack/index share y
+            });
+        });
+
+        ctx.save();
+        ctx.font = "9px Poppins, sans-serif";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#666";
+
+        // Draw label at end of each stack for first data index only
+        for (const [, info] of Object.entries(stackBars)) {
+            const row = info.rows[0];
+            if (!row || row.x <= chart.scales.x.left + 2) continue;
+            ctx.fillText(info.label, row.x + 4, row.y);
+        }
+        ctx.restore();
+    },
+};
+
+Chart.register(inlineLegendPlugin);
+
 const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
     const { data, options } = useMemo(() => {
         if (!businesses || businesses.length === 0) return { data: null, options: null };
@@ -14,7 +53,7 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
                 const s = b.swapOptions[assetKey];
                 return { ...b, totalSwap: s.exercised + s.active + s.approved + s.proposed };
             })
-            .filter((b) => b.totalSwap > 0 || b.ccInfluxAllTime > 0)
+            .filter((b) => b.totalSwap > 0 || (b.ccInfluxCurrentMonth || 0) + (b.ccInflux3m || 0) + (b.ccInfluxOlder || 0) > 0)
             .sort((a, b) => b.totalSwap - a.totalSwap);
 
         if (sorted.length === 0) return { data: null, options: null };
@@ -29,18 +68,21 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
                 data: sorted.map((b) => b.swapOptions[assetKey].exercised),
                 backgroundColor: "rgba(156, 109, 217, 0.8)",
                 stack: "swap",
+                stackLabel: "Swap",
             },
             {
                 label: `Active (${assetLabel})`,
                 data: sorted.map((b) => b.swapOptions[assetKey].active),
                 backgroundColor: "rgba(72, 199, 142, 0.8)",
                 stack: "swap",
+                stackLabel: "Swap",
             },
             {
                 label: `Approved (${assetLabel})`,
                 data: sorted.map((b) => b.swapOptions[assetKey].approved),
                 backgroundColor: "rgba(62, 142, 208, 0.8)",
                 stack: "swap",
+                stackLabel: "Swap",
             },
             {
                 label: `Proposed (${assetLabel})`,
@@ -50,42 +92,56 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
                 borderWidth: 1,
                 borderDash: [4, 4],
                 stack: "swap",
+                stackLabel: "Swap",
             },
             {
-                label: "CC influx (3 months)",
-                data: sorted.map((b) => b.ccInflux3m),
-                backgroundColor: "rgba(232, 143, 107, 0.7)",
-                stack: "cc3m",
+                label: "CC influx (this month)",
+                data: sorted.map((b) => b.ccInfluxCurrentMonth || 0),
+                backgroundColor: "rgba(232, 143, 107, 0.9)",
+                stack: "ccInflux",
+                stackLabel: "CC influx",
             },
             {
-                label: "CC influx (all-time)",
-                data: sorted.map((b) => b.ccInfluxAllTime),
-                backgroundColor: "rgba(232, 143, 107, 0.35)",
-                stack: "ccAll",
+                label: "CC influx (last 3 months)",
+                data: sorted.map((b) => b.ccInflux3m || 0),
+                backgroundColor: "rgba(232, 143, 107, 0.6)",
+                stack: "ccInflux",
+                stackLabel: "CC influx",
+            },
+            {
+                label: "CC influx (older)",
+                data: sorted.map((b) => b.ccInfluxOlder || 0),
+                backgroundColor: "rgba(232, 143, 107, 0.3)",
+                stack: "ccInflux",
+                stackLabel: "CC influx",
             },
             {
                 label: "CC outflow: 2-cycle",
                 data: sorted.map((b) => b.ccOutflow.outflow2),
                 backgroundColor: "rgba(255, 215, 0, 0.7)",
                 stack: "circ",
+                stackLabel: "CC outflow",
             },
             {
                 label: "CC outflow: 3-cycle",
                 data: sorted.map((b) => b.ccOutflow.outflow3),
                 backgroundColor: "rgba(255, 165, 0, 0.7)",
                 stack: "circ",
+                stackLabel: "CC outflow",
             },
             {
                 label: "CC outflow: 4+-cycle",
                 data: sorted.map((b) => b.ccOutflow.outflow4plus),
                 backgroundColor: "rgba(220, 120, 0, 0.7)",
                 stack: "circ",
+                stackLabel: "CC outflow",
             },
             {
                 label: "CC outflow: non-circular",
                 data: sorted.map((b) => b.ccOutflow.outflowNonCircular),
                 backgroundColor: "rgba(200, 200, 200, 0.5)",
                 stack: "circ",
+                stackLabel: "CC outflow",
             },
         ];
 
@@ -95,6 +151,9 @@ const SwapOptionBusinessChart = ({ businesses, assetLabel, assetKey }) => {
                 indexAxis: "y",
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: { right: 80 },
+                },
                 scales: {
                     x: {
                         beginAtZero: true,
