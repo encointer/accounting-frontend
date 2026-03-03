@@ -179,6 +179,14 @@ const CardTransactions = () => {
                             <strong>Status:</strong> {selected.status}
                         </p>
                     )}
+                    {selected.deposit_address && (
+                        <p>
+                            <strong>Deposit address:</strong>{" "}
+                            <code style={{ fontSize: "0.85em", wordBreak: "break-all" }}>
+                                {selected.deposit_address}
+                            </code>
+                        </p>
+                    )}
                     {selected.balance && (
                         <p>
                             <strong>Balance:</strong> {formatBalance(selected.balance)}
