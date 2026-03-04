@@ -100,7 +100,8 @@ Kreivo isn't supported by any familiar tooling (js-apps, nova, subwallet). We ne
 send 0.1 directl to deposit address (replace beneficiary!)
 https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fasset-hub-kusama.ibp.network#/extrinsics/decode/0x1f0d05010100a52305040100000700e8764817010501000105040d010000010100a1ab922215c42de7b837f37858d977d50945ed884a30215b93e2996a18b8fe8f00
 
-send 1.0 USDC.p and 0.1KSM to deposit address
-https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fasset-hub-kusama.ibp.network#/extrinsics/decode/0x1f0d05010100a52305080204090200a10f043205e5140002093d000100000700e8764817010501000105040d010000010100a1ab922215c42de7b837f37858d977d50945ed884a30215b93e2996a18b8fe8f00
-
+send 0.1KSM plus 1.0 USDC.p (order matters!) to deposit address
+https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fasset-hub-kusama.dotters.network#/extrinsics/decode/0x1f0d05010100a52305080100000700e87648170204090200a10f043205e5140002093d00010501000105040d010000010100a1ab922215c42de7b837f37858d977d50945ed884a30215b93e2996a18b8fe8f00
+worked?
+https://assethub-kusama.subscan.io/xcm_message/kusama-cc605b51aebb1b3a73af4b4e1f8b93d5f8054d85
 
