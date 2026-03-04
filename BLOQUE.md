@@ -92,3 +92,15 @@ curl -s "https://api.bloque.app/api/accounts?holder_urn=did:bloque:encointer:<AL
 
 The user can now log into the accounting dashboard and see their accounts under the "Card Transactions" tab.
 
+### deposit
+
+get deposit Address from the frontend. deposits must be made on Kreivo
+Kreivo isn't supported by any familiar tooling (js-apps, nova, subwallet). We need to XCM directly to the deposit address:
+
+send 0.1 directl to deposit address (replace beneficiary!)
+https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fasset-hub-kusama.ibp.network#/extrinsics/decode/0x1f0d05010100a52305040100000700e8764817010501000105040d010000010100a1ab922215c42de7b837f37858d977d50945ed884a30215b93e2996a18b8fe8f00
+
+send 1.0 USDC.p and 0.1KSM to deposit address
+https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fasset-hub-kusama.ibp.network#/extrinsics/decode/0x1f0d05010100a52305080204090200a10f043205e5140002093d000100000700e8764817010501000105040d010000010100a1ab922215c42de7b837f37858d977d50945ed884a30215b93e2996a18b8fe8f00
+
+
