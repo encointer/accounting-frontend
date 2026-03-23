@@ -194,7 +194,7 @@ const SwapOptionAnalysis = () => {
                                                         </td>
                                                         <td>{p.allowance != null ? p.allowance.toFixed(4) : "-"} {assetLabel}</td>
                                                         <td>{p.rate != null ? fmtSig(p.rate) : "-"}</td>
-                                                        <td>{p.passing ? <span className="tag is-success is-light">Pass</span> : <span className="tag is-danger is-light">Fail</span>}</td>
+                                                        <td>{(p.state === "Ongoing" || p.state === "Confirming") ? (p.passing ? <span className="tag is-success is-light">Pass</span> : <span className="tag is-danger is-light">Fail</span>) : ""}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
