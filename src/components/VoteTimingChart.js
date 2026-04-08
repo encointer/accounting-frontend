@@ -1,135 +1,115 @@
-import { Scatter } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
-import annotationPlugin from "chartjs-plugin-annotation";
 
-Chart.register(...registerables, annotationPlugin);
+Chart.register(...registerables);
 
-const VoteTimingChart = ({ votes, attestingWindows, proposals }) => {
+function buildLogHistogram(values, numBins) {
+    const positive = values.filter((v) => v > 0);
+    if (positive.length === 0) return { labels: [], counts: [] };
+
+    const logMin = Math.log10(Math.min(...positive));
+    const logMax = Math.log10(Math.max(...positive));
+    const step = (logMax - logMin) / numBins;
+
+    const counts = new Array(numBins).fill(0);
+    const edges = [];
+    for (let i = 0; i <= numBins; i++) {
+        edges.push(Math.pow(10, logMin + i * step));
+    }
+
+    for (const v of positive) {
+        let bin = Math.floor((Math.log10(v) - logMin) / step);
+        if (bin >= numBins) bin = numBins - 1;
+        if (bin < 0) bin = 0;
+        counts[bin]++;
+    }
+
+    const labels = [];
+    for (let i = 0; i < numBins; i++) {
+        const lo = edges[i];
+        const hi = edges[i + 1];
+        const fmt = (v) => (v >= 1 ? v.toFixed(1) : v.toPrecision(2));
+        labels.push(`${fmt(lo)} – ${fmt(hi)}`);
+    }
+
+    return { labels, counts, edges };
+}
+
+const VoteTimingChart = ({ votes, proposals }) => {
     if (!votes || votes.length === 0) return null;
 
-    // Build a start-time lookup per proposal
     const proposalStart = {};
-    const proposalLifetime = {};
     proposals.forEach((p) => {
         proposalStart[p.id] = p.start;
-        proposalLifetime[p.id] = p.proposalLifetime;
     });
 
     const msToDays = (ms) => ms / (1000 * 3600 * 24);
 
-    // Scatter points: vote offset in days from proposal start
-    const ayePoints = [];
-    const nayPoints = [];
+    const offsets = [];
     votes.forEach((v) => {
         const start = proposalStart[v.proposalId];
         if (start === undefined) return;
-        const offsetDays = msToDays(v.timestamp - start);
-        const point = { x: offsetDays, y: v.proposalId };
-        if (v.vote === "Aye") ayePoints.push(point);
-        else nayPoints.push(point);
+        const days = msToDays(v.timestamp - start);
+        if (days > 0) offsets.push(days);
     });
 
-    // Annotation boxes for attesting windows overlapping each proposal's lifetime
-    const annotations = {};
-    let idx = 0;
-    proposals.forEach((p) => {
-        const pStart = p.start;
-        const pEnd = pStart + (p.proposalLifetime || 0);
-        attestingWindows.forEach((w) => {
-            if (w.end < pStart || w.start > pEnd) return;
-            const xMin = msToDays(Math.max(w.start, pStart) - pStart);
-            const xMax = msToDays(Math.min(w.end, pEnd) - pStart);
-            annotations[`att_${idx++}`] = {
-                type: "box",
-                xMin,
-                xMax,
-                yMin: p.id - 0.4,
-                yMax: p.id + 0.4,
-                backgroundColor: "rgba(255, 206, 86, 0.15)",
-                borderColor: "rgba(255, 206, 86, 0.4)",
-                borderWidth: 1,
-            };
-        });
-    });
-
-    const proposalIds = proposals.map((p) => p.id);
-    const minId = Math.min(...proposalIds);
-    const maxId = Math.max(...proposalIds);
+    const { labels, counts } = buildLogHistogram(offsets, 50);
+    if (labels.length === 0) return null;
 
     return (
-        <div style={{ position: "relative", width: "100%" }}>
-            <Scatter
-                data={{
-                    datasets: [
-                        {
-                            label: "Aye",
-                            data: ayePoints,
-                            backgroundColor: "rgba(75, 192, 75, 0.7)",
-                            borderColor: "rgba(75, 192, 75, 1)",
-                            pointRadius: 5,
-                        },
-                        {
-                            label: "Nay",
-                            data: nayPoints,
-                            backgroundColor: "rgba(255, 99, 132, 0.7)",
-                            borderColor: "rgba(255, 99, 132, 1)",
-                            pointRadius: 5,
-                        },
-                    ],
-                }}
-                options={{
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        annotation: { annotations },
-                        legend: {
-                            labels: {
-                                font: { size: 13, family: "Poppins" },
-                            },
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) =>
-                                    `Proposal #${ctx.raw.y} — ${ctx.dataset.label} at day ${ctx.raw.x.toFixed(1)}`,
-                            },
+        <Bar
+            data={{
+                labels,
+                datasets: [
+                    {
+                        label: "Votes",
+                        data: counts,
+                        backgroundColor: "#4878a8",
+                        borderColor: "#333",
+                        borderWidth: 0.5,
+                    },
+                ],
+            }}
+            options={{
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => `${labels[items[0].dataIndex]} days`,
+                            label: (item) => `${item.parsed.y} votes`,
                         },
                     },
-                    scales: {
-                        x: {
-                            type: "linear",
-                            title: {
-                                text: "Days since proposal submission",
-                                display: true,
-                                font: { size: 15, family: "Poppins" },
-                            },
-                            ticks: {
-                                stepSize: 1,
-                                font: { size: 13, family: "Poppins" },
-                            },
+                },
+                scales: {
+                    x: {
+                        title: {
+                            text: "Days since proposal submission (log scale)",
+                            display: true,
+                            font: { size: 15, family: "Poppins" },
                         },
-                        y: {
-                            type: "linear",
-                            title: {
-                                text: "Proposal ID",
-                                display: true,
-                                font: { size: 15, family: "Poppins" },
-                            },
-                            ticks: {
-                                stepSize: 1,
-                                font: { size: 13, family: "Poppins" },
-                            },
-                            min: minId,
-                            max: maxId,
-                            afterBuildTicks: (axis) => {
-                                axis.ticks = axis.ticks.filter(
-                                    (t) => Number.isInteger(t.value)
-                                );
-                            },
+                        ticks: {
+                            maxTicksLimit: 10,
+                            font: { size: 10, family: "Poppins" },
+                            maxRotation: 45,
+                            minRotation: 45,
                         },
                     },
-                }}
-            />
-        </div>
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            text: "Number of Votes",
+                            display: true,
+                            font: { size: 15, family: "Poppins" },
+                        },
+                        ticks: {
+                            font: { size: 13, family: "Poppins" },
+                            stepSize: 1,
+                        },
+                    },
+                },
+            }}
+        />
     );
 };
 

@@ -193,7 +193,6 @@ const GovernanceDashboard = () => {
                     <h3 className="title is-5 mt-5">Vote Timing</h3>
                     <VoteTimingChart
                         votes={voteTiming.votes}
-                        attestingWindows={voteTiming.attestingWindows}
                         proposals={filtered}
                     />
                 </>
