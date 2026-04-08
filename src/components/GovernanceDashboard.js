@@ -4,6 +4,7 @@ import PublicLayout from "./PublicLayout";
 import ProposalStatsChart from "./ProposalStatsChart";
 import VoteTimingChart from "./VoteTimingChart";
 import VotingPowerChart from "./VotingPowerChart";
+import ProposalTimelineChart from "./ProposalTimelineChart";
 
 const stateColor = {
     Enacted: "success",
@@ -195,6 +196,13 @@ const GovernanceDashboard = () => {
                         attestingWindows={voteTiming.attestingWindows}
                         proposals={filtered}
                     />
+                </>
+            )}
+
+            {filtered.length > 0 && (
+                <>
+                    <h3 className="title is-5 mt-5">Proposal Timeline</h3>
+                    <ProposalTimelineChart proposals={filtered} />
                 </>
             )}
         </PublicLayout>
