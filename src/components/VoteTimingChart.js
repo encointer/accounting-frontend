@@ -3,11 +3,13 @@ import { Chart, registerables } from "chart.js";
 
 Chart.register(...registerables);
 
+const MIN_DAYS = 10 / (60 * 24); // 10 minutes in days
+
 function buildLogHistogram(values, numBins) {
-    const positive = values.filter((v) => v > 0);
+    const positive = values.filter((v) => v > 0).map((v) => Math.max(v, MIN_DAYS));
     if (positive.length === 0) return { labels: [], counts: [] };
 
-    const logMin = Math.log10(Math.min(...positive));
+    const logMin = Math.log10(MIN_DAYS);
     const logMax = Math.log10(Math.max(...positive));
     const step = (logMax - logMin) / numBins;
 
@@ -28,11 +30,22 @@ function buildLogHistogram(values, numBins) {
     for (let i = 0; i < numBins; i++) {
         const lo = edges[i];
         const hi = edges[i + 1];
-        const fmt = (v) => (v >= 1 ? v.toFixed(1) : v.toPrecision(2));
-        labels.push(`${fmt(lo)} – ${fmt(hi)}`);
+        labels.push(i === 0 ? `≤ ${fmtDays(hi)}` : `${fmtDays(lo)} – ${fmtDays(hi)}`);
     }
 
     return { labels, counts, edges };
+}
+
+function fmtDays(days) {
+    if (days < 1 / 24) {
+        const min = days * 24 * 60;
+        return `${Math.round(min)}min`;
+    }
+    if (days < 1) {
+        const hrs = days * 24;
+        return `${hrs.toFixed(1)}h`;
+    }
+    return `${days.toFixed(1)}d`;
 }
 
 const VoteTimingChart = ({ votes, proposals }) => {
@@ -76,7 +89,7 @@ const VoteTimingChart = ({ votes, proposals }) => {
                     legend: { display: false },
                     tooltip: {
                         callbacks: {
-                            title: (items) => `${labels[items[0].dataIndex]} days`,
+                            title: (items) => labels[items[0].dataIndex],
                             label: (item) => `${item.parsed.y} votes`,
                         },
                     },
@@ -84,7 +97,7 @@ const VoteTimingChart = ({ votes, proposals }) => {
                 scales: {
                     x: {
                         title: {
-                            text: "Days since proposal submission (log scale)",
+                            text: "Time since proposal submission (log scale)",
                             display: true,
                             font: { size: 15, family: "Poppins" },
                         },
