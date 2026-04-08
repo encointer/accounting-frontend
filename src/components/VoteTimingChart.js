@@ -1,135 +1,168 @@
-import { Scatter } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
-import annotationPlugin from "chartjs-plugin-annotation";
 
-Chart.register(...registerables, annotationPlugin);
+Chart.register(...registerables);
 
-const VoteTimingChart = ({ votes, attestingWindows, proposals }) => {
+const MIN_DAYS = 10 / (60 * 24); // 10 minutes in days
+
+function buildLogHistogram(values, numBins) {
+    const positive = values.filter((v) => v > 0).map((v) => Math.max(v, MIN_DAYS));
+    if (positive.length === 0) return { labels: [], counts: [] };
+
+    const logMin = Math.log10(MIN_DAYS);
+    const logMax = Math.log10(Math.max(...positive));
+    const step = (logMax - logMin) / numBins;
+
+    const counts = new Array(numBins).fill(0);
+    const edges = [];
+    for (let i = 0; i <= numBins; i++) {
+        edges.push(Math.pow(10, logMin + i * step));
+    }
+
+    for (const v of positive) {
+        let bin = Math.floor((Math.log10(v) - logMin) / step);
+        if (bin >= numBins) bin = numBins - 1;
+        if (bin < 0) bin = 0;
+        counts[bin]++;
+    }
+
+    const labels = [];
+    for (let i = 0; i < numBins; i++) {
+        const hi = edges[i + 1];
+        labels.push(fmtDays(hi));
+    }
+
+    const total = positive.length;
+    let cum = 0;
+    const cumPcts = counts.map((c) => {
+        cum += c;
+        return (cum / total) * 100;
+    });
+
+    return { labels, cumPcts, edges };
+}
+
+function fmtDays(days) {
+    if (days < 1 / 24) {
+        const min = days * 24 * 60;
+        return `${Math.round(min)}min`;
+    }
+    if (days < 1) {
+        const hrs = days * 24;
+        return `${hrs.toFixed(1)}h`;
+    }
+    return `${days.toFixed(1)}d`;
+}
+
+const VoteTimingChart = ({ votes, proposals }) => {
     if (!votes || votes.length === 0) return null;
 
-    // Build a start-time lookup per proposal
     const proposalStart = {};
-    const proposalLifetime = {};
     proposals.forEach((p) => {
         proposalStart[p.id] = p.start;
-        proposalLifetime[p.id] = p.proposalLifetime;
     });
 
     const msToDays = (ms) => ms / (1000 * 3600 * 24);
 
-    // Scatter points: vote offset in days from proposal start
-    const ayePoints = [];
-    const nayPoints = [];
+    const offsets = [];
     votes.forEach((v) => {
         const start = proposalStart[v.proposalId];
         if (start === undefined) return;
-        const offsetDays = msToDays(v.timestamp - start);
-        const point = { x: offsetDays, y: v.proposalId };
-        if (v.vote === "Aye") ayePoints.push(point);
-        else nayPoints.push(point);
+        const days = msToDays(v.timestamp - start);
+        if (days > 0) offsets.push(days);
     });
 
-    // Annotation boxes for attesting windows overlapping each proposal's lifetime
-    const annotations = {};
-    let idx = 0;
-    proposals.forEach((p) => {
-        const pStart = p.start;
-        const pEnd = pStart + (p.proposalLifetime || 0);
-        attestingWindows.forEach((w) => {
-            if (w.end < pStart || w.start > pEnd) return;
-            const xMin = msToDays(Math.max(w.start, pStart) - pStart);
-            const xMax = msToDays(Math.min(w.end, pEnd) - pStart);
-            annotations[`att_${idx++}`] = {
-                type: "box",
-                xMin,
-                xMax,
-                yMin: p.id - 0.4,
-                yMax: p.id + 0.4,
-                backgroundColor: "rgba(255, 206, 86, 0.15)",
-                borderColor: "rgba(255, 206, 86, 0.4)",
-                borderWidth: 1,
-            };
-        });
-    });
+    const { labels, cumPcts, edges } = buildLogHistogram(offsets, 50);
+    if (labels.length === 0) return null;
 
-    const proposalIds = proposals.map((p) => p.id);
-    const minId = Math.min(...proposalIds);
-    const maxId = Math.max(...proposalIds);
+    // Find bin indices closest to desired tick positions
+    const TICK_TARGETS = [
+        { days: 11 / (60 * 24), label: "≤ 11min" },
+        { days: 1 / 24, label: "1h" },
+        { days: 12 / 24, label: "12h" },
+        { days: 1, label: "1d" },
+        { days: 4, label: "4d" },
+    ];
+    const tickIndices = new Set();
+    const tickLabelsMap = {};
+    for (const { days, label } of TICK_TARGETS) {
+        let best = 0;
+        let bestDist = Infinity;
+        for (let i = 0; i < edges.length - 1; i++) {
+            const dist = Math.abs(Math.log10(edges[i + 1]) - Math.log10(days));
+            if (dist < bestDist) {
+                bestDist = dist;
+                best = i;
+            }
+        }
+        tickIndices.add(best);
+        tickLabelsMap[best] = label;
+    }
 
     return (
-        <div style={{ position: "relative", width: "100%" }}>
-            <Scatter
-                data={{
-                    datasets: [
-                        {
-                            label: "Aye",
-                            data: ayePoints,
-                            backgroundColor: "rgba(75, 192, 75, 0.7)",
-                            borderColor: "rgba(75, 192, 75, 1)",
-                            pointRadius: 5,
+        <Line
+            data={{
+                labels,
+                datasets: [
+                    {
+                        label: "Cumulative votes",
+                        data: cumPcts,
+                        borderColor: "#4878a8",
+                        backgroundColor: "rgba(72, 120, 168, 0.1)",
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: true,
+                    },
+                ],
+            }}
+            options={{
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        intersect: false,
+                        mode: "index",
+                        callbacks: {
+                            title: (items) => `≤ ${labels[items[0].dataIndex]}`,
+                            label: (item) => `${item.parsed.y.toFixed(1)}%`,
                         },
-                        {
-                            label: "Nay",
-                            data: nayPoints,
-                            backgroundColor: "rgba(255, 99, 132, 0.7)",
-                            borderColor: "rgba(255, 99, 132, 1)",
-                            pointRadius: 5,
+                    },
+                },
+                scales: {
+                    x: {
+                        title: {
+                            text: "Time since proposal submission (log scale)",
+                            display: true,
+                            font: { size: 15, family: "Poppins" },
                         },
-                    ],
-                }}
-                options={{
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        annotation: { annotations },
-                        legend: {
-                            labels: {
-                                font: { size: 13, family: "Poppins" },
-                            },
+                        afterBuildTicks: (axis) => {
+                            axis.ticks = [...tickIndices]
+                                .sort((a, b) => a - b)
+                                .map((v) => ({ value: v }));
                         },
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) =>
-                                    `Proposal #${ctx.raw.y} — ${ctx.dataset.label} at day ${ctx.raw.x.toFixed(1)}`,
+                        ticks: {
+                            font: { size: 12, family: "Poppins" },
+                            callback: (_, index, ticks) => {
+                                const binIndex = ticks[index].value;
+                                return tickLabelsMap[binIndex] || "";
                             },
                         },
                     },
-                    scales: {
-                        x: {
-                            type: "linear",
-                            title: {
-                                text: "Days since proposal submission",
-                                display: true,
-                                font: { size: 15, family: "Poppins" },
-                            },
-                            ticks: {
-                                stepSize: 1,
-                                font: { size: 13, family: "Poppins" },
-                            },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            text: "% of Votes",
+                            display: true,
+                            font: { size: 15, family: "Poppins" },
                         },
-                        y: {
-                            type: "linear",
-                            title: {
-                                text: "Proposal ID",
-                                display: true,
-                                font: { size: 15, family: "Poppins" },
-                            },
-                            ticks: {
-                                stepSize: 1,
-                                font: { size: 13, family: "Poppins" },
-                            },
-                            min: minId,
-                            max: maxId,
-                            afterBuildTicks: (axis) => {
-                                axis.ticks = axis.ticks.filter(
-                                    (t) => Number.isInteger(t.value)
-                                );
-                            },
+                        ticks: {
+                            font: { size: 13, family: "Poppins" },
+                            callback: (value) => `${value}%`,
                         },
                     },
-                }}
-            />
-        </div>
+                },
+            }}
+        />
     );
 };
 

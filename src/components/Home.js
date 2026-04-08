@@ -1,29 +1,14 @@
 import PublicLayout from "./PublicLayout";
-import RewardsChart from "./RewardsChart";
+import CeremonyParticipationChart from "./CeremonyParticipationChart";
 
 const Home = () => {
   return (
     <PublicLayout>
       <br/>
-      <big>Leu Zürich Rewards Overview</big>
+      <big>Ceremony Participation Over Time</big>
       <br/>
       <br/>
-      <RewardsChart cid="u0qj944rhWE"/>
-      <br/>
-      <big>Nyota Rewards Overview</big>
-      <br/>
-      <br/>
-      <RewardsChart cid="kygch5kVGq7"/>
-      <br/>
-      <big>Paynuq Rewards Overview</big>
-      <br/>
-      <br/>
-      <RewardsChart cid="s1vrqQL2SD"/>
-      <br/>
-      <big>Greenbay Dollar Rewards Overview</big>
-      <br/>
-      <br/>
-      <RewardsChart cid="dpcmj33LUs9"/>
+      <CeremonyParticipationChart />
     </PublicLayout>
   );
 };
