@@ -123,8 +123,11 @@ const CeremonyParticipationChart = () => {
                             callbacks: {
                                 title: (items) => {
                                     const cindex = items[0].parsed.x;
-                                    const date = formatDate(cindexToDate(cindex));
-                                    return `Ceremony ${cindex} (${date})`;
+                                    const date = cindexToDate(cindex);
+                                    const dd = String(date.getUTCDate()).padStart(2, "0");
+                                    const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
+                                    const yyyy = date.getUTCFullYear();
+                                    return `Ceremony ${cindex} (${dd}.${mm}.${yyyy})`;
                                 },
                             },
                         },
