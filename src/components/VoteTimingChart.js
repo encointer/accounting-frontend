@@ -30,7 +30,7 @@ function buildLogHistogram(values, numBins) {
     for (let i = 0; i < numBins; i++) {
         const lo = edges[i];
         const hi = edges[i + 1];
-        labels.push(i === 0 ? `≤ ${fmtDays(hi)}` : `${fmtDays(lo)} – ${fmtDays(hi)}`);
+        labels.push(fmtDays(hi));
     }
 
     return { labels, counts, edges };
