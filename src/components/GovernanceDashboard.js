@@ -19,48 +19,45 @@ function avg(arr) {
     return arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
 }
 
-function KPIRow({ label, turnout, approval }) {
-    if (turnout === null) return null;
-    return (
-        <tr>
-            <td>{label}</td>
-            <td>{turnout.toFixed(1)}%</td>
-            <td>{approval.toFixed(1)}%</td>
-        </tr>
-    );
-}
-
 const ProposalKPIs = ({ proposals }) => {
     const all = proposals.filter((p) => p.turnout > 0);
-    const enacted = all.filter((p) => p.state === "Enacted");
+    const approved = all.filter((p) => p.state === "Enacted");
     const rejected = all.filter((p) => p.state === "Rejected");
+    const total = approved.length + rejected.length;
 
     if (all.length === 0) return null;
 
     const rows = [
-        { label: "All proposals", items: all },
-        { label: "Enacted", items: enacted },
+        { label: "Approved", items: approved },
         { label: "Rejected", items: rejected },
+        { label: "All proposals", items: all },
     ];
 
     return (
-        <table className="table is-narrow is-size-7 mt-3" style={{ maxWidth: 400 }}>
+        <table className="table is-narrow is-size-7 mt-3" style={{ maxWidth: 500 }}>
             <thead>
                 <tr>
                     <th></th>
+                    <th>% of Proposals</th>
                     <th>Avg Turnout</th>
                     <th>Avg Approval</th>
                 </tr>
             </thead>
             <tbody>
-                {rows.map(({ label, items }) => (
-                    <KPIRow
-                        key={label}
-                        label={label}
-                        turnout={avg(items.map((p) => p.turnoutPct))}
-                        approval={avg(items.map((p) => p.approvalPct))}
-                    />
-                ))}
+                {rows.map(({ label, items }) => {
+                    if (items.length === 0) return null;
+                    const pct = label === "All proposals"
+                        ? 100
+                        : total > 0 ? (items.length / total) * 100 : 0;
+                    return (
+                        <tr key={label} style={label === "All proposals" ? { fontWeight: "bold" } : {}}>
+                            <td>{label}</td>
+                            <td>{pct.toFixed(1)}%</td>
+                            <td>{avg(items.map((p) => p.turnoutPct)).toFixed(1)}%</td>
+                            <td>{avg(items.map((p) => p.approvalPct)).toFixed(1)}%</td>
+                        </tr>
+                    );
+                })}
             </tbody>
         </table>
     );
