@@ -15,6 +15,57 @@ const stateColor = {
     SupersededBy: "light",
 };
 
+function avg(arr) {
+    return arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
+}
+
+function KPIRow({ label, turnout, approval }) {
+    if (turnout === null) return null;
+    return (
+        <tr>
+            <td>{label}</td>
+            <td>{turnout.toFixed(1)}%</td>
+            <td>{approval.toFixed(1)}%</td>
+        </tr>
+    );
+}
+
+const ProposalKPIs = ({ proposals }) => {
+    const all = proposals.filter((p) => p.turnout > 0);
+    const enacted = all.filter((p) => p.state === "Enacted");
+    const rejected = all.filter((p) => p.state === "Rejected");
+
+    if (all.length === 0) return null;
+
+    const rows = [
+        { label: "All proposals", items: all },
+        { label: "Enacted", items: enacted },
+        { label: "Rejected", items: rejected },
+    ];
+
+    return (
+        <table className="table is-narrow is-size-7 mt-3" style={{ maxWidth: 400 }}>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Avg Turnout</th>
+                    <th>Avg Approval</th>
+                </tr>
+            </thead>
+            <tbody>
+                {rows.map(({ label, items }) => (
+                    <KPIRow
+                        key={label}
+                        label={label}
+                        turnout={avg(items.map((p) => p.turnoutPct))}
+                        approval={avg(items.map((p) => p.approvalPct))}
+                    />
+                ))}
+            </tbody>
+        </table>
+    );
+};
+
 const GovernanceDashboard = () => {
     const [proposals, setProposals] = useState([]);
     const [voteTiming, setVoteTiming] = useState(null);
@@ -175,6 +226,7 @@ const GovernanceDashboard = () => {
                         Proposal Statistics
                     </h3>
                     <ProposalStatsChart proposals={filtered} />
+                    <ProposalKPIs proposals={filtered} />
                 </>
             )}
 
