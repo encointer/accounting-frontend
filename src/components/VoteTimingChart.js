@@ -28,7 +28,6 @@ function buildLogHistogram(values, numBins) {
 
     const labels = [];
     for (let i = 0; i < numBins; i++) {
-        const lo = edges[i];
         const hi = edges[i + 1];
         labels.push(fmtDays(hi));
     }
