@@ -119,6 +119,15 @@ const CeremonyParticipationChart = () => {
                                 font: { size: 13, family: "Poppins" },
                             },
                         },
+                        tooltip: {
+                            callbacks: {
+                                title: (items) => {
+                                    const cindex = items[0].parsed.x;
+                                    const date = formatDate(cindexToDate(cindex));
+                                    return `Ceremony ${cindex} (${date})`;
+                                },
+                            },
+                        },
                     },
                     scales: {
                         x: {
