@@ -1,4 +1,4 @@
-import { Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 
 Chart.register(...registerables);
@@ -33,7 +33,14 @@ function buildLogHistogram(values, numBins) {
         labels.push(fmtDays(hi));
     }
 
-    return { labels, counts, edges };
+    const total = positive.length;
+    let cum = 0;
+    const cumPcts = counts.map((c) => {
+        cum += c;
+        return (cum / total) * 100;
+    });
+
+    return { labels, cumPcts, edges };
 }
 
 function fmtDays(days) {
@@ -66,20 +73,46 @@ const VoteTimingChart = ({ votes, proposals }) => {
         if (days > 0) offsets.push(days);
     });
 
-    const { labels, counts } = buildLogHistogram(offsets, 50);
+    const { labels, cumPcts, edges } = buildLogHistogram(offsets, 50);
     if (labels.length === 0) return null;
 
+    // Find bin indices closest to desired tick positions
+    const TICK_TARGETS = [
+        { days: 11 / (60 * 24), label: "≤ 11min" },
+        { days: 1 / 24, label: "1h" },
+        { days: 12 / 24, label: "12h" },
+        { days: 1, label: "1d" },
+        { days: 4, label: "4d" },
+    ];
+    const tickIndices = new Set();
+    const tickLabelsMap = {};
+    for (const { days, label } of TICK_TARGETS) {
+        let best = 0;
+        let bestDist = Infinity;
+        for (let i = 0; i < edges.length - 1; i++) {
+            const dist = Math.abs(Math.log10(edges[i + 1]) - Math.log10(days));
+            if (dist < bestDist) {
+                bestDist = dist;
+                best = i;
+            }
+        }
+        tickIndices.add(best);
+        tickLabelsMap[best] = label;
+    }
+
     return (
-        <Bar
+        <Line
             data={{
                 labels,
                 datasets: [
                     {
-                        label: "Votes",
-                        data: counts,
-                        backgroundColor: "#4878a8",
-                        borderColor: "#333",
-                        borderWidth: 0.5,
+                        label: "Cumulative votes",
+                        data: cumPcts,
+                        borderColor: "#4878a8",
+                        backgroundColor: "rgba(72, 120, 168, 0.1)",
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: true,
                     },
                 ],
             }}
@@ -88,9 +121,11 @@ const VoteTimingChart = ({ votes, proposals }) => {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
+                        intersect: false,
+                        mode: "index",
                         callbacks: {
-                            title: (items) => labels[items[0].dataIndex],
-                            label: (item) => `${item.parsed.y} votes`,
+                            title: (items) => `≤ ${labels[items[0].dataIndex]}`,
+                            label: (item) => `${item.parsed.y.toFixed(1)}%`,
                         },
                     },
                 },
@@ -101,23 +136,29 @@ const VoteTimingChart = ({ votes, proposals }) => {
                             display: true,
                             font: { size: 15, family: "Poppins" },
                         },
+                        afterBuildTicks: (axis) => {
+                            axis.ticks = [...tickIndices]
+                                .sort((a, b) => a - b)
+                                .map((v) => ({ value: v }));
+                        },
                         ticks: {
-                            maxTicksLimit: 10,
-                            font: { size: 10, family: "Poppins" },
-                            maxRotation: 45,
-                            minRotation: 45,
+                            font: { size: 12, family: "Poppins" },
+                            callback: (_, index, ticks) => {
+                                const binIndex = ticks[index].value;
+                                return tickLabelsMap[binIndex] || "";
+                            },
                         },
                     },
                     y: {
                         beginAtZero: true,
                         title: {
-                            text: "Number of Votes",
+                            text: "% of Votes",
                             display: true,
                             font: { size: 15, family: "Poppins" },
                         },
                         ticks: {
                             font: { size: 13, family: "Poppins" },
-                            stepSize: 1,
+                            callback: (value) => `${value}%`,
                         },
                     },
                 },
