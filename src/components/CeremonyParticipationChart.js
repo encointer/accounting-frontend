@@ -91,24 +91,7 @@ const CeremonyParticipationChart = () => {
     if (datasets.length === 0) return null;
 
     return (
-        <div style={{ position: "relative" }}>
-            {dateTicks.length > 0 && (
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        paddingLeft: 55,
-                        paddingRight: 15,
-                        fontSize: 11,
-                        color: "#666",
-                        fontFamily: "Poppins",
-                    }}
-                >
-                    {dateTicks.map((c) => (
-                        <span key={c}>{formatDate(cindexToDate(c))}</span>
-                    ))}
-                </div>
-            )}
+        <div>
             <Line
                 data={{ datasets }}
                 options={{
@@ -135,6 +118,7 @@ const CeremonyParticipationChart = () => {
                     scales: {
                         x: {
                             type: "linear",
+                            position: "bottom",
                             title: {
                                 text: "Ceremony Index",
                                 display: true,
@@ -143,6 +127,21 @@ const CeremonyParticipationChart = () => {
                             ticks: {
                                 font: { size: 13, family: "Poppins" },
                                 stepSize: 10,
+                            },
+                        },
+                        xDate: {
+                            type: "linear",
+                            position: "top",
+                            min: allCindexes[0],
+                            max: allCindexes[allCindexes.length - 1],
+                            grid: { drawOnChartArea: false },
+                            afterBuildTicks: (axis) => {
+                                axis.ticks = dateTicks.map((v) => ({ value: v }));
+                            },
+                            ticks: {
+                                font: { size: 11, family: "Poppins" },
+                                color: "#666",
+                                callback: (value) => formatDate(cindexToDate(value)),
                             },
                         },
                         y: {
