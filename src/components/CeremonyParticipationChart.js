@@ -60,7 +60,7 @@ const CeremonyParticipationChart = () => {
                     borderColor: r.color,
                     backgroundColor: r.color,
                     pointRadius: 3,
-                    borderWidth: 1,
+                    borderWidth: 2,
                     fill: false,
                 });
             }
