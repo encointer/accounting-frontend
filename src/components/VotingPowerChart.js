@@ -8,7 +8,7 @@ const VotingPowerChart = ({ proposals, reputationLifetime }) => {
     const { histogram, participation, gaussian, summary } = useMemo(() => {
         if (!proposals.length) return {};
 
-        const maxPower = (reputationLifetime || 5) - 1;
+        const maxPower = (reputationLifetime || 5) - 2;
         const powers = Array.from({ length: maxPower }, (_, i) => i + 1);
 
         // Mean voter count per power level, averaged across proposals
