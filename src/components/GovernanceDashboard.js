@@ -73,12 +73,25 @@ const GovernanceDashboard = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [propRes, voteRes, vpRes] = await Promise.all([
+                const [propRes, voteRes, vpRes, svcRes] = await Promise.all([
                     apiGet("governance/proposals"),
                     apiGet("governance/vote-timing"),
                     apiGet("governance/voting-power-analysis"),
+                    apiGet("governance/swap-voter-client-analysis"),
                 ]);
-                if (propRes.ok) setProposals(await propRes.json());
+                let clientMap = {};
+                if (svcRes.ok) {
+                    const svcData = await svcRes.json();
+                    for (const s of svcData) {
+                        if (s.totalAyeVoters > 0) {
+                            clientMap[s.id] = Math.round((s.clientVoters / s.totalAyeVoters) * 1000) / 10;
+                        }
+                    }
+                }
+                if (propRes.ok) {
+                    const props = await propRes.json();
+                    setProposals(props.map((p) => ({ ...p, clientPct: clientMap[p.id] })));
+                }
                 if (voteRes.ok) setVoteTiming(await voteRes.json());
                 if (vpRes.ok) setVotingPower(await vpRes.json());
             } catch (e) {
@@ -163,7 +176,7 @@ const GovernanceDashboard = () => {
                             <th>Ayes</th>
                             <th>Turnout%</th>
                             <th>Approval%</th>
-                            <th>Threshold%</th>
+                            <th>Clients%</th>
                             <th>Result</th>
                         </tr>
                     </thead>
@@ -199,7 +212,7 @@ const GovernanceDashboard = () => {
                                 <td>{p.ayes}</td>
                                 <td>{p.turnoutPct}%</td>
                                 <td>{p.approvalPct}%</td>
-                                <td>{p.thresholdPct}%</td>
+                                <td>{p.clientPct != null ? `${p.clientPct}%` : ""}</td>
                                 <td>
                                     {p.passing ? (
                                         <span className="tag is-success is-light">
