@@ -11,12 +11,21 @@ import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
 
 const VoterBubbleChart = ({ voters }) => {
-    const data = voters.map((v) => ({
+    const personal = voters.filter((v) => !v.isBusiness).map((v) => ({
         x: v.proposalsVoted,
         y: v.avgMonthlySpending,
         r: v.avgVotingPower * 4,
         voter: v.voter.slice(0, 8) + "\u2026",
         power: v.avgVotingPower,
+        name: v.name,
+    }));
+    const business = voters.filter((v) => v.isBusiness).map((v) => ({
+        x: v.proposalsVoted,
+        y: v.avgMonthlySpending,
+        r: v.avgVotingPower * 4,
+        voter: v.voter.slice(0, 8) + "\u2026",
+        power: v.avgVotingPower,
+        name: v.name,
     }));
 
     return (
@@ -24,27 +33,35 @@ const VoterBubbleChart = ({ voters }) => {
             data={{
                 datasets: [
                     {
-                        label: "Voters",
-                        data,
+                        label: "Personal",
+                        data: personal,
                         backgroundColor: "rgba(54, 162, 235, 0.5)",
                         borderColor: "rgba(54, 162, 235, 1)",
+                        borderWidth: 1,
+                    },
+                    {
+                        label: "Business",
+                        data: business,
+                        backgroundColor: "rgba(255, 159, 64, 0.5)",
+                        borderColor: "rgba(255, 159, 64, 1)",
                         borderWidth: 1,
                     },
                 ],
             }}
             options={{
                 plugins: {
-                    legend: { display: false },
+                    legend: {
+                        labels: { font: { size: 12, family: "Poppins" } },
+                    },
                     tooltip: {
                         callbacks: {
                             label: (ctx) => {
                                 const d = ctx.raw;
-                                return [
-                                    d.voter,
-                                    `Proposals: ${d.x}`,
-                                    `Avg spending: ${d.y.toFixed(0)} CC/mo`,
-                                    `Avg power: ${d.power}`,
-                                ];
+                                const lines = [d.name ? `${d.name} (${d.voter})` : d.voter];
+                                lines.push(`Proposals: ${d.x}`);
+                                lines.push(`Avg spending: ${d.y.toFixed(0)} CC/mo`);
+                                lines.push(`Avg power: ${d.power}`);
+                                return lines;
                             },
                         },
                     },
