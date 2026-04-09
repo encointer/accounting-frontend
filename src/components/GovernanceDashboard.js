@@ -10,23 +10,24 @@ import { Chart, registerables } from "chart.js";
 
 Chart.register(...registerables);
 
-const VoterBubbleChart = ({ voters }) => {
-    const personal = voters.filter((v) => !v.isBusiness).map((v) => ({
+const CC_SYMBOLS = {
+    "u0qj944rhWE": "LEU",
+    "kygch5kVGq7": "NYT",
+    "s1vrqQL2SD": "PNQ",
+    "dpcmj33LUs9": "GBD",
+};
+
+const VoterBubbleChart = ({ voters, unit }) => {
+    const toPoint = (v) => ({
         x: v.proposalsVoted,
-        y: v.avgMonthlySpending,
+        y: Math.max(v.avgMonthlySpending, 0.1),
         r: v.avgVotingPower * 4,
         voter: v.voter.slice(0, 8) + "\u2026",
         power: v.avgVotingPower,
         name: v.name,
-    }));
-    const business = voters.filter((v) => v.isBusiness).map((v) => ({
-        x: v.proposalsVoted,
-        y: v.avgMonthlySpending,
-        r: v.avgVotingPower * 4,
-        voter: v.voter.slice(0, 8) + "\u2026",
-        power: v.avgVotingPower,
-        name: v.name,
-    }));
+    });
+    const personal = voters.filter((v) => !v.isBusiness).map(toPoint);
+    const business = voters.filter((v) => v.isBusiness).map(toPoint);
 
     return (
         <Bubble
@@ -59,7 +60,7 @@ const VoterBubbleChart = ({ voters }) => {
                                 const d = ctx.raw;
                                 const lines = [d.name ? `${d.name} (${d.voter})` : d.voter];
                                 lines.push(`Proposals: ${d.x}`);
-                                lines.push(`Avg spending: ${d.y.toFixed(0)} CC/mo`);
+                                lines.push(`Avg spending: ${d.y.toFixed(0)} ${unit}/mo`);
                                 lines.push(`Avg power: ${d.power}`);
                                 return lines;
                             },
@@ -76,9 +77,9 @@ const VoterBubbleChart = ({ voters }) => {
                         ticks: { font: { size: 12, family: "Poppins" } },
                     },
                     y: {
-                        beginAtZero: true,
+                        type: "logarithmic",
                         title: {
-                            text: "Avg Monthly CC Spending",
+                            text: `Avg Monthly Spending (${unit}/mo)`,
                             display: true,
                             font: { size: 13, family: "Poppins" },
                         },
@@ -390,7 +391,12 @@ const GovernanceDashboard = () => {
             {voterHighscore && voterHighscore.length > 0 && (
                 <>
                     <h3 className="title is-5 mt-5">Voter Participation</h3>
-                    <VoterBubbleChart voters={voterHighscore} />
+                    <VoterBubbleChart
+                        voters={voterHighscore}
+                        unit={communityFilter !== "all" && communityFilter !== "global"
+                            ? (CC_SYMBOLS[communityFilter] || "CC")
+                            : "nominal"}
+                    />
                     <VoterHighscoreTable voters={voterHighscore} />
                 </>
             )}
