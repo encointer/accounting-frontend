@@ -192,12 +192,11 @@ const GovernanceDashboard = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [propRes, voteRes, vpRes, svcRes, hsRes] = await Promise.all([
+                const [propRes, voteRes, vpRes, svcRes] = await Promise.all([
                     apiGet("governance/proposals"),
                     apiGet("governance/vote-timing"),
                     apiGet("governance/voting-power-analysis"),
                     apiGet("governance/swap-voter-client-analysis"),
-                    apiGet("governance/voter-highscore"),
                 ]);
                 let clientMap = {};
                 if (svcRes.ok) {
@@ -214,7 +213,6 @@ const GovernanceDashboard = () => {
                 }
                 if (voteRes.ok) setVoteTiming(await voteRes.json());
                 if (vpRes.ok) setVotingPower(await vpRes.json());
-                if (hsRes.ok) setVoterHighscore(await hsRes.json());
             } catch (e) {
                 console.error("Failed to fetch governance data", e);
             } finally {
@@ -223,6 +221,20 @@ const GovernanceDashboard = () => {
         };
         fetchData();
     }, []);
+
+    useEffect(() => {
+        const fetchHighscore = async () => {
+            const cidParam = communityFilter !== "all" && communityFilter !== "global"
+                ? `?cid=${communityFilter}` : "";
+            try {
+                const res = await apiGet(`governance/voter-highscore${cidParam}`);
+                if (res.ok) setVoterHighscore(await res.json());
+            } catch (e) {
+                console.error("Failed to fetch voter highscore", e);
+            }
+        };
+        fetchHighscore();
+    }, [communityFilter]);
 
     // Distinct communities for the filter dropdown, with names
     const communities = useMemo(() => {
