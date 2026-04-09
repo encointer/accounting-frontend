@@ -20,7 +20,7 @@ const CC_SYMBOLS = {
 const VoterBubbleChart = ({ voters, unit }) => {
     const toPoint = (v) => ({
         x: v.proposalsVoted,
-        y: Math.max(v.avgMonthlySpending, 0.1),
+        y: Math.max(v.avgSpending3mo, 0.1),
         r: v.avgVotingPower * 4,
         voter: v.voter.slice(0, 8) + "\u2026",
         power: v.avgVotingPower,
@@ -60,7 +60,7 @@ const VoterBubbleChart = ({ voters, unit }) => {
                                 const d = ctx.raw;
                                 const lines = [d.name ? `${d.name} (${d.voter})` : d.voter];
                                 lines.push(`Proposals: ${d.x}`);
-                                lines.push(`Avg spending: ${d.y.toFixed(0)} ${unit}/mo`);
+                                lines.push(`Avg 3mo spending: ${d.y.toFixed(0)} ${unit}`);
                                 lines.push(`Avg power: ${d.power}`);
                                 return lines;
                             },
@@ -79,7 +79,7 @@ const VoterBubbleChart = ({ voters, unit }) => {
                     y: {
                         type: "logarithmic",
                         title: {
-                            text: `Avg Monthly Spending (${unit}/mo)`,
+                            text: `Avg 3-Month Spending (${unit})`,
                             display: true,
                             font: { size: 13, family: "Poppins" },
                         },
@@ -101,7 +101,7 @@ const VoterHighscoreTable = ({ voters }) => {
                         <th>Account</th>
                         <th>Proposals Voted</th>
                         <th>Avg Power</th>
-                        <th>Avg Monthly CC Spending</th>
+                        <th>Avg 3mo Spending</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -115,7 +115,7 @@ const VoterHighscoreTable = ({ voters }) => {
                             </td>
                             <td>{v.proposalsVoted}</td>
                             <td>{v.avgVotingPower}</td>
-                            <td>{v.avgMonthlySpending > 0 ? v.avgMonthlySpending.toFixed(0) : ""}</td>
+                            <td>{v.avgSpending3mo > 0 ? v.avgSpending3mo.toFixed(0) : ""}</td>
                         </tr>
                     ))}
                 </tbody>
