@@ -108,7 +108,9 @@ const VoterHighscoreTable = ({ voters }) => {
                         <tr key={v.voter}>
                             <td>{i + 1}</td>
                             <td title={v.voter} style={{ fontFamily: "monospace" }}>
-                                {v.voter.slice(0, 8)}&hellip;
+                                {v.name
+                                    ? <>{v.name} <span style={{ color: "#999" }}>({v.voter.slice(0, 8)}&hellip;)</span></>
+                                    : <>{v.voter.slice(0, 8)}&hellip;</>}
                             </td>
                             <td>{v.proposalsVoted}</td>
                             <td>{v.avgVotingPower}</td>
