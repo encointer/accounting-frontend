@@ -5,6 +5,104 @@ import ProposalStatsChart from "./ProposalStatsChart";
 import VoteTimingChart from "./VoteTimingChart";
 import VotingPowerChart from "./VotingPowerChart";
 import ProposalTimelineChart from "./ProposalTimelineChart";
+import { Bubble } from "react-chartjs-2";
+import { Chart, registerables } from "chart.js";
+
+Chart.register(...registerables);
+
+const VoterBubbleChart = ({ voters }) => {
+    const data = voters.map((v) => ({
+        x: v.proposalsVoted,
+        y: v.avgMonthlySpending,
+        r: v.avgVotingPower * 4,
+        voter: v.voter.slice(0, 8) + "\u2026",
+        power: v.avgVotingPower,
+    }));
+
+    return (
+        <Bubble
+            data={{
+                datasets: [
+                    {
+                        label: "Voters",
+                        data,
+                        backgroundColor: "rgba(54, 162, 235, 0.5)",
+                        borderColor: "rgba(54, 162, 235, 1)",
+                        borderWidth: 1,
+                    },
+                ],
+            }}
+            options={{
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                const d = ctx.raw;
+                                return [
+                                    d.voter,
+                                    `Proposals: ${d.x}`,
+                                    `Avg spending: ${d.y.toFixed(0)} CC/mo`,
+                                    `Avg power: ${d.power}`,
+                                ];
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    x: {
+                        title: {
+                            text: "Proposals Voted",
+                            display: true,
+                            font: { size: 13, family: "Poppins" },
+                        },
+                        ticks: { font: { size: 12, family: "Poppins" } },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            text: "Avg Monthly CC Spending",
+                            display: true,
+                            font: { size: 13, family: "Poppins" },
+                        },
+                        ticks: { font: { size: 12, family: "Poppins" } },
+                    },
+                },
+            }}
+        />
+    );
+};
+
+const VoterHighscoreTable = ({ voters }) => {
+    return (
+        <div className="table-container">
+            <table className="table is-striped is-fullwidth is-size-7">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Account</th>
+                        <th>Proposals Voted</th>
+                        <th>Avg Power</th>
+                        <th>Avg Monthly CC Spending</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {voters.map((v, i) => (
+                        <tr key={v.voter}>
+                            <td>{i + 1}</td>
+                            <td title={v.voter} style={{ fontFamily: "monospace" }}>
+                                {v.voter.slice(0, 8)}&hellip;
+                            </td>
+                            <td>{v.proposalsVoted}</td>
+                            <td>{v.avgVotingPower}</td>
+                            <td>{v.avgMonthlySpending > 0 ? v.avgMonthlySpending.toFixed(0) : ""}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
 
 const stateColor = {
     Enacted: "success",
@@ -67,17 +165,19 @@ const GovernanceDashboard = () => {
     const [proposals, setProposals] = useState([]);
     const [voteTiming, setVoteTiming] = useState(null);
     const [votingPower, setVotingPower] = useState(null);
+    const [voterHighscore, setVoterHighscore] = useState(null);
     const [loading, setLoading] = useState(true);
     const [communityFilter, setCommunityFilter] = useState("all");
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [propRes, voteRes, vpRes, svcRes] = await Promise.all([
+                const [propRes, voteRes, vpRes, svcRes, hsRes] = await Promise.all([
                     apiGet("governance/proposals"),
                     apiGet("governance/vote-timing"),
                     apiGet("governance/voting-power-analysis"),
                     apiGet("governance/swap-voter-client-analysis"),
+                    apiGet("governance/voter-highscore"),
                 ]);
                 let clientMap = {};
                 if (svcRes.ok) {
@@ -94,6 +194,7 @@ const GovernanceDashboard = () => {
                 }
                 if (voteRes.ok) setVoteTiming(await voteRes.json());
                 if (vpRes.ok) setVotingPower(await vpRes.json());
+                if (hsRes.ok) setVoterHighscore(await hsRes.json());
             } catch (e) {
                 console.error("Failed to fetch governance data", e);
             } finally {
@@ -264,6 +365,14 @@ const GovernanceDashboard = () => {
                 <>
                     <h3 className="title is-5 mt-5">Proposal Timeline</h3>
                     <ProposalTimelineChart proposals={filtered} />
+                </>
+            )}
+
+            {voterHighscore && voterHighscore.length > 0 && (
+                <>
+                    <h3 className="title is-5 mt-5">Voter Participation</h3>
+                    <VoterBubbleChart voters={voterHighscore} />
+                    <VoterHighscoreTable voters={voterHighscore} />
                 </>
             )}
         </PublicLayout>
