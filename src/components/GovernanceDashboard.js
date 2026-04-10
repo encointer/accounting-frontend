@@ -91,6 +91,25 @@ const VoterBubbleChart = ({ voters, unit }) => {
     );
 };
 
+const VoterKPIs = ({ voters, unit }) => {
+    if (!voters.length) return null;
+    const sorted = (arr) => [...arr].sort((a, b) => a - b);
+    const median = (arr) => {
+        const s = sorted(arr);
+        const mid = Math.floor(s.length / 2);
+        return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+    };
+    const medianProposals = median(voters.map((v) => v.proposalsVoted));
+    const medianSpending = median(voters.map((v) => v.avgSpending3mo));
+    return (
+        <p className="is-size-7 mt-2 mb-3">
+            Median voter: <strong>{medianProposals}</strong> proposals voted,{" "}
+            <strong>{medianSpending.toFixed(0)}</strong> {unit} turnover (3mo avg before proposal).{" "}
+            {voters.length} voters total.
+        </p>
+    );
+};
+
 const VoterHighscoreTable = ({ voters }) => {
     return (
         <div className="table-container">
@@ -404,6 +423,12 @@ const GovernanceDashboard = () => {
                 <>
                     <h3 className="title is-5 mt-5">Voter Participation</h3>
                     <VoterBubbleChart
+                        voters={voterHighscore}
+                        unit={communityFilter !== "all" && communityFilter !== "global"
+                            ? (CC_SYMBOLS[communityFilter] || "CC")
+                            : "nominal"}
+                    />
+                    <VoterKPIs
                         voters={voterHighscore}
                         unit={communityFilter !== "all" && communityFilter !== "global"
                             ? (CC_SYMBOLS[communityFilter] || "CC")
